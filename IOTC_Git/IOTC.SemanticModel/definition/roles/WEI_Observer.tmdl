@@ -1,7 +1,0 @@
-role WEI_Observer
-	modelPermission: read
-
-	tablePermission Catch_Estimates_Model = [Fishing Ground] = "Western Indian Ocean"
-
-	annotation PBI_Id = a856f7ce51e842f496725ee355e1c376
-

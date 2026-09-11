@@ -1,8 +1,0 @@
-{
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
-  "name": "763b4967b4ace22aea4d",
-  "displayName": "Catch Ranking Analysis",
-  "displayOption": "FitToPage",
-  "height": 720,
-  "width": 1280
-}

@@ -1,2 +1,19 @@
-# IOTC_PowerBI_Report
-Analysis of fleet efficiency and quota sustainability, based on IOTC public datasets, for the period between 2000 and 2024.
+# IOTC Catch and Effort Analysis - Power BI Semantic Model and Report
+
+## Synopsis:
+
+This report was developed with the purpose of applying the skills acquired through my self-directed study for the PL_300 certification to a dataset that relates to my experience as a fisheries observer in the IOTC Regulatory Area. 
+
+## Repository structure:
+
+- IOTC/ contains the semantic model and report json files.
+- assets/ contains illustrative images of each page of the report and of the semantic model.
+- README.md contains the project explanation.
+
+## Data Sources:
+
+
+
+
+
+

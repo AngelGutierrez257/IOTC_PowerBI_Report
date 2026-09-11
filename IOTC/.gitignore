@@ -1,0 +1,10 @@
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+**/*.backup
+**/*.tmp
+**/*.temp
+**/*.pbip.autosave
+Thumbs.db
+Desktop.ini
+.DS_Store
+.vscode/

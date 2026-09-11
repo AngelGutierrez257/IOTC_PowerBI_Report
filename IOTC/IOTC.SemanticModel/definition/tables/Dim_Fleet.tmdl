@@ -1,0 +1,96 @@
+table Dim_Fleet
+	lineageTag: 2631ee8d-3489-4698-9e98-baaee202915b
+
+	column Index
+		dataType: int64
+		formatString: 0
+		lineageTag: 802f57c5-cd6f-453d-8c0a-76c1d49ff307
+		summarizeBy: sum
+		sourceColumn: Index
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fleet
+		dataType: string
+		lineageTag: dc660648-8c46-4124-ae36-26f6968222cf
+		summarizeBy: none
+		sourceColumn: Fleet
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SubFleet
+		dataType: string
+		lineageTag: e4b0206b-930f-46df-96a0-203441931afa
+		summarizeBy: none
+		sourceColumn: SubFleet
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fleet Code'
+		dataType: string
+		lineageTag: 0daf68e0-0cea-4700-99ae-a332c3d17cac
+		summarizeBy: none
+		sourceColumn: Fleet Code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Class Type'
+		dataType: string
+		lineageTag: 9dc7249f-51c0-4821-8435-b6fff8ce811d
+		summarizeBy: none
+		sourceColumn: Class Type
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Class Type Code'
+		dataType: string
+		lineageTag: 184ec8bf-06a9-4616-a28f-f2c4f5c3fd47
+		summarizeBy: none
+		sourceColumn: Class Type Code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'EU Fleet'
+		dataType: string
+		lineageTag: 49547f7d-ff1a-497d-98d3-20538ceab00e
+		summarizeBy: none
+		sourceColumn: EU Fleet
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Fleet = m
+		mode: import
+		queryGroup: Dimensions
+		source = ```
+				let //ao fazer measures sobre flags, houve uma diferença entre o numero de fleet codes em catch estimates e em flet statistics (54 e 47 registos distinctos. A Dim_Fleet foi reformulada para usar colunas das duas colunas, mantendo o count da fleet code da catch estimates, usando join.
+				    Catch_Estimates = Table.Buffer(Catch_Estimates),
+				    SelecionarColunas = Table.SelectColumns(Catch_Estimates, {"Fleet Code", "Fleet", "SubFleet", "EU Fleet"}),
+				    SelecionarDistintos = Table.Distinct(SelecionarColunas, {"Fleet Code"}),
+				    UniraFleetStatistics = Table.NestedJoin(SelecionarDistintos, {"Fleet Code"}, Fleet_Statistics, {"Fleet Code"}, "Fleet_Joined", JoinKind.LeftOuter),
+				    ExpandirColuna = Table.ExpandTableColumn(UniraFleetStatistics, "Fleet_Joined", {"Class Type Code", "Class Type"}),
+				    TratarNulls = Table.ReplaceValue(ExpandirColuna, null, "Not specified", Replacer.ReplaceValue, {"Class Type", "Class Type Code"}),
+				    Deduplicar = Table.Distinct(TratarNulls, {"Fleet Code"}),
+				    Index = Table.AddIndexColumn(Deduplicar, "Index", 1, 1, Int64.Type),
+				    ReordenarColunas = Table.ReorderColumns(Index, {"Index", "Fleet", "SubFleet", "Fleet Code", "Class Type", "Class Type Code", "EU Fleet"})
+				    
+				    
+				in
+				    ReordenarColunas
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

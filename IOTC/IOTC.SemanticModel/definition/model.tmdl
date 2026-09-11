@@ -1,0 +1,48 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-GB
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+queryGroup Parameters
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup Dimensions
+
+	annotation PBI_QueryGroupOrder = 1
+
+queryGroup 'Queries to Upload'
+
+	annotation PBI_QueryGroupOrder = 2
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["Catch_Estimates","Conexao Pasta","Fleet_Statistics","RC-SCI_1950-2024_PATH","Fishing_Craft_Statistics_Path","Fish_Prices_Excel_Path","Crude_Oil_Prices_Excel_Path","Tuna_Import_Prices","Fishing_Effort","Crude_Prices","StartYear","Geographical_Data_Connection","Dim_Species","Dim_Fisheries&Gear","Dim_Fleet","Dim_Fate","Fishing_Effort_Model","Catch_Estimates_Model","Fleet_Statistics_Model","Dim_Date","Verify Dim fleet differences","IOTC_Major_Geo_Areas"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table Tuna_Import_Prices
+ref table Crude_Prices
+ref table Dim_Species
+ref table Dim_Fisheries&Gear
+ref table Dim_Fleet
+ref table Dim_Fate
+ref table Fishing_Effort_Model
+ref table Catch_Estimates_Model
+ref table Fleet_Statistics_Model
+ref table Dim_Date
+ref table _Measures
+ref table Dim_Year_Bridge
+ref table FuelPriceMultiplier
+ref table IOTC_Major_Geo_Areas
+ref table Dim_YearMonth_Bridge
+ref table 'Quota Reduction'
+
+ref role WEI_Observer
+ref role EIO_Observer
+
+ref cultureInfo en-US
+

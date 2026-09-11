@@ -1,0 +1,214 @@
+table Catch_Estimates_Model
+	lineageTag: 986549af-47c3-4970-8974-816c4e514ef5
+
+	column Index
+		dataType: int64
+		formatString: 0
+		lineageTag: 59944537-5cda-479e-8efb-ac213d27abba
+		summarizeBy: sum
+		sourceColumn: Index
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		dataType: double
+		lineageTag: 09f510ac-1d73-4366-8220-229b12adcd82
+		summarizeBy: none
+		sourceColumn: Year
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Fishing Ground Code'
+		dataType: string
+		lineageTag: f3b92d16-7c5f-4950-8451-a0fb39a0f427
+		summarizeBy: none
+		sourceColumn: Fishing Ground Code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fishing Ground'
+		dataType: string
+		lineageTag: 4fd2a411-3370-4c0e-9c87-e3169e496ee8
+		summarizeBy: none
+		sourceColumn: Fishing Ground
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fleet Code'
+		dataType: string
+		lineageTag: d7904ccf-d638-433b-a3d3-29290c2f8aa2
+		summarizeBy: none
+		sourceColumn: Fleet Code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'EU Fleet'
+		dataType: string
+		lineageTag: 5f145ee6-025f-4112-810f-c448050b74c2
+		summarizeBy: none
+		sourceColumn: EU Fleet
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fishery Type Code'
+		dataType: string
+		lineageTag: 94d68189-c733-4861-a223-d52ca9c98104
+		summarizeBy: none
+		sourceColumn: Fishery Type Code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fishery Group Code'
+		dataType: string
+		lineageTag: 287279d8-b356-451a-8e7f-fcf08bdd5ef5
+		summarizeBy: none
+		sourceColumn: Fishery Group Code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fishery Code'
+		dataType: string
+		lineageTag: f9e25e8f-bfa2-48f2-bb81-a4ed057aae0f
+		summarizeBy: none
+		sourceColumn: Fishery Code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Gear FAO Code'
+		dataType: string
+		lineageTag: dd185c07-3beb-48b7-a58f-91ba8423da77
+		summarizeBy: none
+		sourceColumn: Gear FAO Code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Species Category Code'
+		dataType: string
+		lineageTag: e7337910-7b1a-4d46-9daa-0dfa475a4fde
+		summarizeBy: none
+		sourceColumn: Species Category Code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Species Code'
+		dataType: string
+		lineageTag: 919fa81e-8654-4284-81e4-bf6204147c97
+		summarizeBy: none
+		sourceColumn: Species Code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fate Type Code'
+		dataType: string
+		lineageTag: a6fa8184-3fae-40ee-affa-9f50b0507acd
+		summarizeBy: none
+		sourceColumn: Fate Type Code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fate Code'
+		dataType: string
+		lineageTag: cac832fa-b51f-48e8-bd5a-5db624b22e97
+		summarizeBy: none
+		sourceColumn: Fate Code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Catch Weight'
+		dataType: double
+		formatString: #,0.00
+		lineageTag: adf1cd63-0698-4693-8fe8-fc34a855f5d8
+		summarizeBy: sum
+		sourceColumn: Catch Weight
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation __PBI_SemanticLinks = [{"LinkTarget":{"TableName":"Catch_Estimates_Model","TableItemName":"Catch Weight (bins)","ObjectType":4},"LinkType":"UsedInGroup"}]
+
+	column 'Catch Weight (bins)' =
+			IF(
+				ISBLANK('Catch_Estimates_Model'[Catch Weight]),
+				BLANK(),
+				IF(
+					'Catch_Estimates_Model'[Catch Weight] >= 0,
+					ROUNDDOWN('Catch_Estimates_Model'[Catch Weight] / 5000, 0) * 5000,
+					ROUNDUP('Catch_Estimates_Model'[Catch Weight] / 5000, 0) * 5000
+				)
+			)
+		formatString: #,0.00
+		lineageTag: 327759c9-ee6b-4570-94e7-677d75ee4879
+		summarizeBy: none
+
+		extendedProperty GroupingMetadata =
+				{
+				  "version": 0,
+				  "groupedColumns": [
+				    {
+				      "Column": {
+				        "Expression": {
+				          "SourceRef": {
+				            "Entity": "Catch_Estimates_Model"
+				          }
+				        },
+				        "Property": "Catch Weight"
+				      }
+				    }
+				  ],
+				  "binningMetadata": {
+				    "binSize": {
+				      "value": 5000.0,
+				      "unit": 0
+				    }
+				  }
+				}
+
+		annotation GroupingDesignState = {"Version":0,"Sources":[{"Name":"c","Entity":"Catch_Estimates_Model"}],"GroupedColumns":[{"Column":{"Expression":{"SourceRef":{"Source":"c"}},"Property":"Catch Weight"}}],"BinItem":{"Expression":{"Floor":{"Expression":{"Column":{"Expression":{"SourceRef":{"Source":"c"}},"Property":"Catch Weight"}},"Size":5000.0}}}}
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Catch_Estimates_Model = m
+		mode: import
+		queryGroup: 'Queries to Upload'
+		source =
+				let
+				    Fonte = Table.Buffer(Catch_Estimates),
+				    RemoverColunas = Table.RemoveColumns(Fonte, {"Fishery Type", "Fishery Group", "Fishery", "Gear", "Fleet", "SubFleet", "Fate","Fate Type",  "Species Name", "Species Scientific Name", "Species Category"})
+				in
+				    RemoverColunas
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

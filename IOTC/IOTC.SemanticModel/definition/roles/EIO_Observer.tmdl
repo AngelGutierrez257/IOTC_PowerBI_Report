@@ -1,0 +1,7 @@
+role EIO_Observer
+	modelPermission: read
+
+	tablePermission Catch_Estimates_Model = [Fishing Ground] = "Eastern Indian Ocean"
+
+	annotation PBI_Id = 88c5995a471d46b7b53d63723a21c1c5
+

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "e4667296a8a723f17902",
+  "position": {
+    "x": 0,
+    "y": 0,
+    "z": 2000,
+    "height": 720.41407728772685,
+    "width": 358.14871270875562,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Species"
+                    }
+                  },
+                  "Property": "Species Name"
+                }
+              },
+              "queryRef": "Dim_Species.Species Name",
+              "nativeQueryRef": "Species Name"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Catch_Estimates_Model"
+                        }
+                      },
+                      "Property": "Catch Weight"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Catch_Estimates_Model.Catch Weight)",
+              "nativeQueryRef": "Sum of Catch Weight"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

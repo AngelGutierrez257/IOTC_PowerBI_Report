@@ -1,0 +1,140 @@
+table Dim_Fisheries&Gear
+	lineageTag: 7981d8dc-1423-490f-98b2-b12893a6bc5e
+
+	column Index
+		dataType: int64
+		formatString: 0
+		lineageTag: 6725f1fc-2061-44ac-99a6-6e49809394cb
+		summarizeBy: sum
+		sourceColumn: Index
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Gear
+		dataType: string
+		lineageTag: 04fc2eeb-279b-47a0-ae09-7ffd021fa94c
+		summarizeBy: none
+		sourceColumn: Gear
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Gear FAO Code'
+		dataType: string
+		lineageTag: a3f21672-e948-49fc-b8d5-b2d3c9f06ba8
+		summarizeBy: none
+		sourceColumn: Gear FAO Code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fishery
+		dataType: string
+		lineageTag: ed80ff20-def5-470f-87e2-660403b85fb5
+		summarizeBy: none
+		sourceColumn: Fishery
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fishery Code'
+		dataType: string
+		lineageTag: c77aacae-3a12-48d0-80e8-f38645a1c52d
+		summarizeBy: none
+		sourceColumn: Fishery Code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fishery Group'
+		dataType: string
+		lineageTag: e6d7f6f3-f8ee-42b9-bf7a-c490b15862e3
+		summarizeBy: none
+		sourceColumn: Fishery Group
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fishery Group Code'
+		dataType: string
+		lineageTag: ddbe1b37-e3ef-4ded-8c16-d12458ea435c
+		summarizeBy: none
+		sourceColumn: Fishery Group Code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fishery Type'
+		dataType: string
+		lineageTag: 216e0dd3-5df9-4d5f-99f6-17952a923543
+		summarizeBy: none
+		sourceColumn: Fishery Type
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fishery Type Code'
+		dataType: string
+		lineageTag: 9cc56797-814a-42cb-8db2-226c583dc9fa
+		summarizeBy: none
+		sourceColumn: Fishery Type Code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Fishery Type Hierarchy'
+		lineageTag: 094e0724-8c4e-4821-afc7-4f1e8ad591fd
+
+		level 'Fishery Type'
+			lineageTag: a105ebf0-0a65-44ea-b814-58c724393ba3
+			column: 'Fishery Type'
+
+		level 'Fishery Group'
+			lineageTag: cc52083a-92a4-4ddb-a599-943f3c05aed9
+			column: 'Fishery Group'
+
+		level Fishery
+			lineageTag: e4b3bcab-e49c-485f-892b-3b0c96a413ed
+			column: Fishery
+
+		changedProperty = IsHidden
+
+	partition Dim_Fisheries&Gear = m
+		mode: import
+		queryGroup: Dimensions
+		source = ```
+				let
+				    
+				    ColunasPretendidas = {"Fishery Type Code", "Fishery Type", "Fishery Group Code", "Fishery Group", "Fishery Code", "Fishery", "Gear FAO Code", "Gear"},
+				    VerificarColunas = List.Select(ColunasPretendidas, each List.Contains(Table.ColumnNames(Catch_Estimates), _)),
+				    SelecionarColunas = Table.SelectColumns(Catch_Estimates, VerificarColunas),
+				    ColunasPretendidasEffort = {"GEAR_CODE", "GEAR", "FISHERY", "FISHERY_CODE", "FISHERY_GROUP", "FISHERY_GROUP_CODE", "FISHERY_TYPE", "FISHERY_TYPE_CODE"},
+				    VerificarColunasEffort = List.Select(ColunasPretendidasEffort, each List.Contains(Table.ColumnNames(Fishing_Effort), _)),
+				    SelecionarColunasEffort = Table.SelectColumns(Fishing_Effort,VerificarColunasEffort),
+				    UniformizarNomesColunas = Table.RenameColumns(SelecionarColunasEffort, {{"GEAR_CODE", "Gear FAO Code"},{"GEAR", "Gear"},{"FISHERY", "Fishery"},{"FISHERY_CODE", "Fishery Code"},{"FISHERY_GROUP", "Fishery Group"},{"FISHERY_GROUP_CODE", "Fishery Group Code"},{"FISHERY_TYPE", "Fishery Type"},{"FISHERY_TYPE_CODE", "Fishery Type Code"}}),
+				    CombinarCatcheEffort  = Table.Combine({ SelecionarColunas, UniformizarNomesColunas}),
+				    SelecionarDistintos = Table.Distinct(CombinarCatcheEffort, {"Gear FAO Code"}),
+				    Index = Table.AddIndexColumn(SelecionarDistintos, "Index", 1, 1, Int64.Type),
+				    ReordenarColunas = Table.ReorderColumns(Index, {"Index", "Gear", "Gear FAO Code", "Fishery", "Fishery Code", "Fishery Group", "Fishery Group Code", "Fishery Type", "Fishery Type Code"}),
+				    TratarNulls = Table.ReplaceValue(ReordenarColunas, "NA", "Not specified", Replacer.ReplaceValue, {"Gear", "Gear FAO Code"})
+				
+				in
+				    TratarNulls
+				
+				    // Nested Join demorava muito tempo. Table.Combine foi sugerido pelo gemini como mais rápido.
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,134 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "592e1714eb49c76e6c42",
+  "position": {
+    "x": 530.26063100137173,
+    "y": 258.10699588477365,
+    "z": 2000,
+    "height": 461.7832647462277,
+    "width": 509.19067215363509,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Fisheries&Gear"
+                    }
+                  },
+                  "Property": "Gear"
+                }
+              },
+              "queryRef": "Dim_Fisheries&Gear.Gear",
+              "nativeQueryRef": "Gear",
+              "active": true
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Fishing Effort Hooks"
+                }
+              },
+              "queryRef": "_Measures.Fishing Effort",
+              "nativeQueryRef": "Fishing Effort"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "% of Effort by Fleet"
+                }
+              },
+              "queryRef": "_Measures.% of Effort by Fleet",
+              "nativeQueryRef": "% of Effort by Fleet"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Measures"
+                  }
+                },
+                "Property": "Fishing Effort Hooks"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "62f08363b4626493d275",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Fishing Effort Hooks"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "b2cc9f740dedd138a9ec",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "% of Effort by Fleet"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "efea4e306bb8559ddb0b",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Dim_Fisheries&Gear"
+              }
+            },
+            "Property": "Gear"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
+  }
+}

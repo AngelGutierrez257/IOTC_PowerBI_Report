@@ -1,0 +1,139 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "36d76f9351c4ad5d3600",
+  "position": {
+    "x": 386.59898477157361,
+    "y": 360.60913705583755,
+    "z": 2,
+    "height": 321.62436548223349,
+    "width": 893.40101522842644,
+    "tabOrder": 2
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Year_Bridge"
+                    }
+                  },
+                  "Property": "Year"
+                }
+              },
+              "queryRef": "Dim_Year_Bridge.Year",
+              "nativeQueryRef": "Year",
+              "active": true
+            }
+          ]
+        },
+        "Series": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Fisheries&Gear"
+                    }
+                  },
+                  "Property": "Fishery Group Code"
+                }
+              },
+              "queryRef": "Dim_Fisheries&Gear.Fishery Group Code",
+              "nativeQueryRef": "Fishery Group Code"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Fuel Adj Margin"
+                }
+              },
+              "queryRef": "_Measures.Fuel Adj Margin",
+              "nativeQueryRef": "Fuel Adj Margin"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Measures"
+                  }
+                },
+                "Property": "Fuel Adj Margin"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "252fdb1ebd45c5fd1c7e",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Fuel Adj Margin"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "ea6290216cad40e84fa3",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Dim_Fisheries&Gear"
+              }
+            },
+            "Property": "Fishery Group Code"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "fa1dc790054abb269c7e",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Dim_Year_Bridge"
+              }
+            },
+            "Property": "Year"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

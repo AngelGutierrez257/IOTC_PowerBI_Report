@@ -1,0 +1,216 @@
+table Fishing_Effort_Model
+	lineageTag: 60cd1725-63c8-406d-be3c-03abba98119a
+
+	column Index
+		dataType: int64
+		formatString: 0
+		lineageTag: 365f1f02-dfca-4274-a80e-c8119f754f99
+		summarizeBy: sum
+		sourceColumn: Index
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column YEAR
+		dataType: double
+		lineageTag: b2932bcf-9e7f-4f86-a377-252e266e1f55
+		summarizeBy: none
+		sourceColumn: YEAR
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column QUARTER
+		dataType: string
+		lineageTag: 3cb75afc-8425-4d23-aa15-adfaa0d17790
+		summarizeBy: none
+		sourceColumn: QUARTER
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column FISHING_GROUND_CODE
+		dataType: double
+		lineageTag: c3dcf7b8-cf05-494f-976f-5eed6c0af898
+		summarizeBy: sum
+		sourceColumn: FISHING_GROUND_CODE
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column FLEET_CODE
+		dataType: string
+		lineageTag: 575a7a11-df55-41ed-9dd5-6f523d9a723f
+		summarizeBy: none
+		sourceColumn: FLEET_CODE
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column FISHERY_TYPE_CODE
+		dataType: string
+		lineageTag: 081491bd-f5f1-42cf-b656-dd9a78394cdb
+		summarizeBy: none
+		sourceColumn: FISHERY_TYPE_CODE
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column FISHERY_GROUP_CODE
+		dataType: string
+		lineageTag: e3ce8ce4-a5f5-4078-8934-ad7ddca8fef7
+		summarizeBy: none
+		sourceColumn: FISHERY_GROUP_CODE
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column FISHERY_CODE
+		dataType: string
+		lineageTag: df3a618a-53ce-4d17-ba98-6750ac6588bf
+		summarizeBy: none
+		sourceColumn: FISHERY_CODE
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column GEAR_CODE
+		dataType: string
+		lineageTag: e382d9ad-bf0b-4af5-a928-39ea201ff345
+		summarizeBy: none
+		sourceColumn: GEAR_CODE
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column EFFORT_SCHOOL_TYPE_CODE
+		dataType: string
+		lineageTag: 7aa979b4-15a9-433d-a765-8ffce67a5520
+		summarizeBy: none
+		sourceColumn: EFFORT_SCHOOL_TYPE_CODE
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column CATCH_SCHOOL_TYPE_CODE
+		dataType: string
+		lineageTag: fa851800-5f79-48f2-af7a-a680a490714d
+		summarizeBy: none
+		sourceColumn: CATCH_SCHOOL_TYPE_CODE
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column EFFORT
+		dataType: double
+		lineageTag: 00b2bfb0-1caa-4c6d-908e-807eef8c1940
+		summarizeBy: sum
+		sourceColumn: EFFORT
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column EFFORT_UNIT_CODE
+		dataType: string
+		lineageTag: 8d605bb9-0c18-42ea-8d48-7fbc0f1e1d63
+		summarizeBy: none
+		sourceColumn: EFFORT_UNIT_CODE
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SPECIES_CATEGORY_CODE
+		dataType: string
+		lineageTag: 68221ba7-b272-4416-864c-d8f9549e8a2f
+		summarizeBy: none
+		sourceColumn: SPECIES_CATEGORY_CODE
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column SPECIES_CODE
+		dataType: string
+		lineageTag: 0b302bf6-b97b-4535-b374-0905c6cab6af
+		summarizeBy: none
+		sourceColumn: SPECIES_CODE
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column CATCH_UNIT_CODE
+		dataType: string
+		lineageTag: a919febc-b96e-4ce3-be82-d0df1408a7b2
+		summarizeBy: none
+		sourceColumn: CATCH_UNIT_CODE
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column FATE_CODE
+		dataType: string
+		lineageTag: 6a037eac-fe86-4767-a6bf-2b57c3ebf39d
+		summarizeBy: none
+		sourceColumn: FATE_CODE
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column CATCH
+		dataType: double
+		lineageTag: 18df0bfd-130b-4445-8cd6-063728c65495
+		summarizeBy: sum
+		sourceColumn: CATCH
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column YEARQUARTER
+		dataType: string
+		lineageTag: 3709ab2f-3e23-4150-b70d-e171f78b4000
+		summarizeBy: none
+		sourceColumn: YEARQUARTER
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fishing_Effort_Model = m
+		mode: import
+		queryGroup: 'Queries to Upload'
+		source =
+				let
+				    Fonte = Table.Buffer(Fishing_Effort),
+				    RemoverColunas = Table.RemoveColumns(Fonte, {"FLEET", "EU Fleet", "FISHERY_TYPE", "FISHERY_GROUP", "FISHERY", "GEAR", "SPECIES_CATEGORY", "SPECIES", "FATE", "FATE_TYPE"})
+				in
+				    RemoverColunas
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

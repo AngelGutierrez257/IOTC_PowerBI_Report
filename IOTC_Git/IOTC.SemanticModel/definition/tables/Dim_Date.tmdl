@@ -1,0 +1,149 @@
+table Dim_Date
+	lineageTag: 75c088ae-125b-4f81-b45f-b5f2754c2d88
+
+	column Date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: d982c070-ce36-4734-8418-d6997b4343dd
+		summarizeBy: none
+		sourceColumn: Date
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Day Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: ac20773e-23cd-40c4-aceb-d52092f7d352
+		summarizeBy: sum
+		sourceColumn: Day Number
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day Name'
+		dataType: string
+		lineageTag: a836e816-9276-4813-84fc-00a851c2f458
+		summarizeBy: none
+		sourceColumn: Day Name
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: 6e25eb80-c9db-4e80-af09-43aab9963add
+		summarizeBy: sum
+		sourceColumn: Month Number
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Name'
+		dataType: string
+		lineageTag: 68e99e02-b530-44be-9eb5-4c2fef516654
+		summarizeBy: none
+		sourceColumn: Month Name
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: string
+		lineageTag: ba65d938-bc90-4e2a-b5d4-12ec962b453b
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: d3679565-25ed-446a-93ea-1b298d0191c4
+		summarizeBy: none
+		sourceColumn: Year
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column YearMonth
+		dataType: int64
+		formatString: 0
+		lineageTag: a9acbfeb-c97b-4374-a862-c0e1154cc2fc
+		summarizeBy: none
+		sourceColumn: YearMonth
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column YearQuarter
+		dataType: string
+		lineageTag: eb469507-49f8-4adf-9d65-5ca4b2e84b37
+		summarizeBy: none
+		sourceColumn: YearQuarter
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Year Hierarchy'
+		lineageTag: 5173c4bf-f167-4423-8c99-c80822092cd6
+
+		level Year
+			lineageTag: e4784cc4-6a46-448e-bf30-3d40a9da9611
+			column: Year
+
+		level Quarter
+			lineageTag: 630a3178-3d89-4d3d-b560-e58947048cc3
+			column: Quarter
+
+		level 'Month Number'
+			lineageTag: 37a8c02e-387e-47d5-b989-7c9911c62143
+			column: 'Month Number'
+
+		level 'Month Name'
+			lineageTag: ceb5d89b-ce1c-4e34-a328-2c4002d04cb9
+			column: 'Month Name'
+
+		changedProperty = IsHidden
+
+	partition Dim_Date = m
+		mode: import
+		queryGroup: Dimensions
+		source =
+				let
+				    DataInicial = #date(2000,1,1),
+				    DataFinal = #date(2030,1,1),
+				    Cultura = "en-EN",
+				    ContagemDias = Duration.Days(DataFinal-DataInicial)+1,
+				    ListaDias = List.Dates(DataInicial , ContagemDias, #duration(1,0,0,0)),
+				    TabelaDias = Table.FromList(ListaDias, Splitter.SplitByNothing(),{"Date"}),
+				    DefinirTipo = Table.TransformColumnTypes(TabelaDias, {{"Date", type date}}),
+				    AdicionarAno = Table.AddColumn(DefinirTipo, "Year", each Date.Year([Date]), Int64.Type),
+				    AdicionarTrimestre = Table.AddColumn(AdicionarAno, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date])), type text),
+				    AdicionarDia = Table.AddColumn(AdicionarTrimestre, "Day Number", each Date.Day([Date]), Int64.Type),
+				    AdicionarMes = Table.AddColumn(AdicionarDia, "Month Number", each Date.Month([Date]), Int64.Type),
+				    AdicionarNomeMes = Table.AddColumn(AdicionarMes, "Month Name", each Date.MonthName([Date]), type text ),
+				    AdicionarNomeDia = Table.AddColumn(AdicionarNomeMes, "Day Name", each Date.DayOfWeekName([Date]), type text),
+				    AdicionarYearMonth = Table.AddColumn(AdicionarNomeDia, "YearMonth", each [Year]*100+[Month Number], Int64.Type),
+				    AdicionarYearQuarter = Table.AddColumn(AdicionarYearMonth, "YearQuarter", each Text.From([Year]) & [Quarter], type text),
+				    ReordenarColunas = Table.ReorderColumns(AdicionarYearQuarter, {"Date", "Day Number", "Day Name", "Month Number", "Month Name", "Quarter", "Year", "YearMonth", "YearQuarter"})
+				in
+				    ReordenarColunas
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

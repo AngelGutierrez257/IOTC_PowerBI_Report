@@ -1,0 +1,26 @@
+table 'Quota Reduction'
+	lineageTag: 17ca7a47-26fd-46fc-8691-072f33745341
+
+	measure 'Quota Reduction Value' = SELECTEDVALUE('Quota Reduction'[Quota Reduction], 0)
+		formatString: 0
+		lineageTag: c3b76799-01f7-4dc4-b5ac-607310aa2332
+
+	column 'Quota Reduction'
+		formatString: 0
+		lineageTag: 3b44b428-ae33-4cca-ba55-9aa7bfe19a7d
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition 'Quota Reduction' = calculated
+		mode: import
+		source = GENERATESERIES(0, 50, 5)
+
+	annotation PBI_Id = 9b4bb14db4af4dedb6734ee043027d0d
+

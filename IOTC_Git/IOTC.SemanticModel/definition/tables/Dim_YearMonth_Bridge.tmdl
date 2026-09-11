@@ -1,0 +1,18 @@
+table Dim_YearMonth_Bridge
+	lineageTag: 8e9cd753-6d3e-4397-84e2-437388663427
+
+	column YearMonth
+		formatString: 0
+		lineageTag: 1d374389-a3cf-4c52-bed6-36d855a58460
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [YearMonth]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_YearMonth_Bridge = calculated
+		mode: import
+		source = DISTINCT(SELECTCOLUMNS(Dim_Date, "YearMonth", Dim_Date[YearMonth]))
+
+	annotation PBI_Id = a85a23db565346c0be9fd0802c278ff5
+

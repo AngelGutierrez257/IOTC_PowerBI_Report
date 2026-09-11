@@ -1,0 +1,134 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "eb5ee42f50c4d8d98c65",
+  "position": {
+    "x": 8.77914951989026,
+    "y": 258.10699588477365,
+    "z": 1000,
+    "height": 461.7832647462277,
+    "width": 521.48148148148141,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Fisheries&Gear"
+                    }
+                  },
+                  "Property": "Gear"
+                }
+              },
+              "queryRef": "Dim_Fisheries&Gear.Gear",
+              "nativeQueryRef": "Gear",
+              "active": true
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "% of Catch by Gear"
+                }
+              },
+              "queryRef": "_Measures.% of Catch by Gear",
+              "nativeQueryRef": "% of Catch by Gear"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Total Catches by Gear"
+                }
+              },
+              "queryRef": "_Measures.Total Catches by Gear",
+              "nativeQueryRef": "Total Catches by Gear"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Measures"
+                  }
+                },
+                "Property": "% of Catch by Gear"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "3fec6666162c8e483e1d",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "% of Catch by Gear"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "59ea22f4c133e9514710",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Dim_Fisheries&Gear"
+              }
+            },
+            "Property": "Gear"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "bdb85ac0b999866b5064",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Total Catches by Gear"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

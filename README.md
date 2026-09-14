@@ -46,20 +46,26 @@ The Claude Manuals are available for download in main.
   - Model Title: Tuna_Import_Prices
   - Origin: https://iotc.org/data/datasets/latest/SD/TUNAS
   - Connector type: Csv with parameter
-    ``` Fonte = Excel.Workbook(File.Contents(#"Fish_Prices_Excel_Path")),´´´ with parameter Fish_Prices_Excel_Path.
+    ```
+    Fonte = Excel.Workbook(File.Contents(#"Fish_Prices_Excel_Path")),
+    ´´´ with parameter Fish_Prices_Excel_Path.
 
 ### Crude Prices
   - Original Title: FFA_crude_oil_price_time_series.xlsx
   - Model Title: Crude_Prices
   - Origin: https://iotc.org/data/datasets/latest/SD/FUEL
   -  Connector type: Csv with parameter
-      ``` Fonte = Excel.Workbook(File.Contents(Crude_Oil_Prices_Excel_Path)),´´´ with parameter Crude_Oil_Prices_Excel_Path.
+      ```
+      Fonte = Excel.Workbook(File.Contents(Crude_Oil_Prices_Excel_Path)),
+      ´´´ with parameter Crude_Oil_Prices_Excel_Path.
 
 ### IOTC Main Areas (Geographical data)
   - Original Title: IOTC_MAIN_AREAS_10.0.0.csv
   - Model Title: IOTC_Major_Geo_Areas
   - Origin: https://data.iotc.org/reference/latest/domain/admin/#geospatialData
-     ``` Fonte = Csv.Document(File.Contents(Geographical_Data_Connection)), ´´´ with parameter Geographical_Data_Connection.
+     ```
+     Fonte = Csv.Document(File.Contents(Geographical_Data_Connection)),
+     ´´´ with parameter Geographical_Data_Connection.
  
 
 The use of parameters is preferred has it handles changes in source locations more gracefully and easily and also allow the use of deployment pipelines.
@@ -70,8 +76,8 @@ The use of parameters is preferred has it handles changes in source locations mo
   Mai tasks: Data normalization, null handling, prepare data for modelling, filter and define data types, rows and columns relevant for the model.
 
   ### Power Query Parameter: 
-    - Besides the connectors, a parameter was defined to uniformly select rows >= the year 2000. 
-        - Parameter Name: StartYear
+  Besides the connectors, a parameter was defined to uniformly select rows >= the year 2000. 
+  Parameter Name: StartYear
 
 
   ## Fact Tables:

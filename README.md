@@ -24,48 +24,55 @@ The Claude Manuals are available for download in main.
   - Original Title: IOTC-DATASETS-2026-05-27-RC-SCI-1950-2024.csv
   - Model Title: Catch_Estimates
   - Origin: https://iotc.org/data/datasets/Retained catches by year, main IOTC area, fleet, and gear for all IOTC and bycatch species
-  - Connection type: Csv with parameter
-    ``` Fonte = Csv.Document(File.Contents(#"RC-SCI_1950-2024_PATH"))´´´ with parameter RC-SCI_1950-2024_PATH.
+  - Connection type: Csv with with parameter RC-SCI_1950-2024_PATH
+    ```
+    Fonte = Csv.Document(File.Contents(#"RC-SCI_1950-2024_PATH"))
+    ´´´ 
 
 ### Yearly fleet statistics:
   - Original Title: Fishing_Craft_Statistics_20250702.zip
   - Model Title: Fleet_Statistics
   - Origin: https://iotc.org/data/datasets/Annual Number of Vessels by Fishing Fleet, Gear, Architecture, Mechanisation type, Size class, and Fish Preservation Method (Fishing Craft Statistics)
-  - Connector type: Csv with parameter
-     ``` Fonte = Csv.Document(File.Contents(#"Conexao Pasta" & "\IOTC-DATASETS-2026-02-23-CE-1952-2024.csv")) ´´´ with parameter Conexao Pasta as Folder Connector.
+  - Connector type: Csv with parameter Conexao Pasta as Folder Connector.
+     ```
+     Fonte = Csv.Document(File.Contents(#"Conexao Pasta" & "\IOTC-DATASETS-2026-02-23-CE-1952-2024.csv"))
+     ´´´ 
    
 ### Monthly Fishing Effort
   - Original Title: IOTC-DATASETS-2026-02-23-CE-1952-2024.csv
   - Model Title: Fishing_Effort
   - Origin: https://iotc.org/data/datasets/latest/CE/All
-  - Connector type: Csv with parameter
-     ``` Fonte = Csv.Document(File.Contents(#"Conexao Pasta" & "\IOTC-DATASETS-2026-02-23-CE-1952-2024.csv")),´´´ with parameter parameter Conexao Pasta as Folder Connector.
+  - Connector type: Csv with parameter parameter Conexao Pasta as Folder Connector.
+     ```
+     Fonte = Csv.Document(File.Contents(#"Conexao Pasta" & "\IOTC-DATASETS-2026-02-23-CE-1952-2024.csv")),
+     ´´´ 
 
 ### Tuna Import Prices
   - Original Title: FFA_import_price_tuna_time_series.xlsx
   - Model Title: Tuna_Import_Prices
   - Origin: https://iotc.org/data/datasets/latest/SD/TUNAS
-  - Connector type: Csv with parameter
+  - Connector type: Csv with parameter Fish_Prices_Excel_Path.
     ```
     Fonte = Excel.Workbook(File.Contents(#"Fish_Prices_Excel_Path")),
-    ´´´ with parameter Fish_Prices_Excel_Path.
+    ´´´ 
 
 ### Crude Prices
   - Original Title: FFA_crude_oil_price_time_series.xlsx
   - Model Title: Crude_Prices
   - Origin: https://iotc.org/data/datasets/latest/SD/FUEL
-  -  Connector type: Csv with parameter
+  -  Connector type: Csv with parameter  Crude_Oil_Prices_Excel_Path.
       ```
       Fonte = Excel.Workbook(File.Contents(Crude_Oil_Prices_Excel_Path)),
-      ´´´ with parameter Crude_Oil_Prices_Excel_Path.
-
+      ´´´
+      
 ### IOTC Main Areas (Geographical data)
   - Original Title: IOTC_MAIN_AREAS_10.0.0.csv
   - Model Title: IOTC_Major_Geo_Areas
   - Origin: https://data.iotc.org/reference/latest/domain/admin/#geospatialData
+  - Connector type: Csv with parameter Geographical_Data_Connection.
      ```
      Fonte = Csv.Document(File.Contents(Geographical_Data_Connection)),
-     ´´´ with parameter Geographical_Data_Connection.
+     ´´´ 
  
 
 The use of parameters is preferred has it handles changes in source locations more gracefully and easily and also allow the use of deployment pipelines.

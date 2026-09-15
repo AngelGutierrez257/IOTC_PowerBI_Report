@@ -96,11 +96,11 @@ The use of parameters is preferred has it handles changes in source locations mo
 
   ## Fact Tables:
 
-  ### Catch_Estimates (not imported to the model)
+### Catch_Estimates (not imported to the model)
   
 1. Basic transformations: Promote headers, Remove Spaces, alter data types, column title uniformization:
     
-      ``` 
+      ``` powerquery
       Fonte = Csv.Document(File.Contents(#"RC-SCI_1950-2024_PATH")),
     PromoverNomes = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true]),
     RemoverEspaços = Table.TransformColumns(PromoverNomes, {}, Text.Trim),
@@ -173,7 +173,7 @@ The use of parameters is preferred has it handles changes in source locations mo
   At this stage, the Catch_Estimates fact table has 26 columns. This number will be lower after the creation of the Dim Tables.
 
 
-  ### Fleet_Statistics (not imported to the model):
+### Fleet_Statistics (not imported to the model):
   
 
 1. Basic transformations: Promote headers, Remove Spaces, alter data types, column title uniformization:
@@ -247,6 +247,9 @@ The use of parameters is preferred has it handles changes in source locations mo
    ```
    ReordenarColunas = Table.ReorderColumns(AdicionarEUFleet, {"Index","Year","Fleet Code", "Fleet","SubFleet", "EU Fleet","Fishery Type Code", "Fishery Type", "Gear Code", "Gear FAO Code", "Gear", "Gear Group", "Class Lower Length",  "Class Upper Length", "Class Type Code", "Class Type", "Number of Vessels", "Fishing Grounds"})
    ```
+
+
+### 
    
 
   

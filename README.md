@@ -112,7 +112,6 @@ The use of parameters is preferred has it handles changes in source locations mo
    
     ```powerquery
     SelecionarLinhas = Table.SelectRows(UniformizaçãoTitulos, each [Year]>=StartYear),
-    
     ``` 
 
 3. Adding index to allow for running totals and previous-rows calculations, ordered operations and increase table relationship performance:
@@ -144,7 +143,7 @@ The use of parameters is preferred has it handles changes in source locations mo
     
     ```powerquery
     NormalizarFleet = Table.TransformColumns(SubstituirNullsSubFleet,{{"Fleet",each  if Text.Contains(_,",") then Text.BeforeDelimiter(_,",") else _, type text}}),
-    ´´´
+    ```
 
 8. Normalize NEI values in the fleet column (NEI respects to data of extinct or not known enttities):
     
@@ -220,7 +219,7 @@ The use of parameters is preferred has it handles changes in source locations mo
 6. As well, the sub regions present in the fleet column needed to be extracted to normalize all fleet values:
    
     ```powerquery
- AdicionarSubFleet = Table.AddColumn(NormalizarEU, "SubFleet", each if Text.Contains(Text.Trim([Fleet]), " ") and Text.Contains(Text.Trim([Fleet Code]), "EU") or Text.Contains(Text.Trim([Fleet]), "Uk")   then Text.AfterDelimiter([Fleet], " ") else "", type text),
+   AdicionarSubFleet = Table.AddColumn(NormalizarEU, "SubFleet", each if Text.Contains(Text.Trim([Fleet]), " ") and Text.Contains(Text.Trim([Fleet Code]), "EU") or Text.Contains(Text.Trim([Fleet]), "Uk")   then   Text.AfterDelimiter([Fleet], " ") else "", type text),
     SubstituirNullsSubFleet = Table.ReplaceValue(AdicionarSubFleet, "", "Not applicable", Replacer.ReplaceValue, {"SubFleet"}),
     ```
 
@@ -259,53 +258,62 @@ The use of parameters is preferred has it handles changes in source locations mo
    ```
 
 2. Contrary to the previous tables, some columns were selected immediately to lower the size of the import and optimize subsequent transformations, as the columns left out were clearly not needed. To always select the same columns, applied a dynamic selection by creating a list, select the values of that list that were present in the columns names of the table, also converted as list, and selecting columns by referencing the original table with the PromoteHeaders and the list compared in the previous step:
+
    ```powerquery
    ColunasPretendidas = {"YEAR", "QUARTER", "FISHING_GROUND_CODE", "FLEET_CODE", "FLEET", "FISHERY_TYPE_CODE", "FISHERY_TYPE", "FISHERY_GROUP_CODE", "FISHERY_GROUP", "FISHERY_CODE", "FISHERY", "GEAR_CODE", "GEAR", "EFFORT_SCHOOL_TYPE_CODE", "CATCH_SCHOOL_TYPE_CODE", "EFFORT", "EFFORT_UNIT_CODE", "SPECIES_CATEGORY_CODE", "SPECIES_CATEGORY", "SPECIES_CODE", "SPECIES", "CATCH_UNIT_CODE", "FATE_TYPE", "FATE_CODE", "FATE", "CATCH"  },
     ColunasPresentes = List.Select(ColunasPretendidas, each List.Contains(Table.ColumnNames(PromoverTitulos),_)),
     SelecionarColunas = Table.SelectColumns(PromoverTitulos, ColunasPresentes),
    ```
 
-3. Replace string values in catch column:
+4. Replace string values in catch column:
+
    ```powerquery
     AlterarNAColCatch = Table.ReplaceValue(SelecionarColunas, "NA", 0.0,Replacer.ReplaceValue, {"CATCH"}),
    ```
 
-4. Basic transformation, alter column data types on the dynamically selected columns:
+6. Basic transformation, alter column data types on the dynamically selected columns:
+
    ```powerquery
    AlterarTipos = Table.TransformColumnTypes(AlterarNAColCatch,{{"YEAR", type number}, {"QUARTER", type text}, {"FISHING_GROUND_CODE",type number}, {"FLEET_CODE", type text},{"FLEET", type text}, {"FISHERY_TYPE_CODE", type text}, {"FISHERY_TYPE", type text}, {"FISHERY_GROUP_CODE", type text}, {"FISHERY_GROUP", type text}, {"FISHERY_CODE", type text}, {"FISHERY", type text}, {"GEAR_CODE", type text}, {"GEAR", type text}, {"EFFORT_SCHOOL_TYPE_CODE",type text} , {"CATCH_SCHOOL_TYPE_CODE",type text},{"EFFORT",type number}, {"EFFORT_UNIT_CODE", type text}, {"SPECIES_CATEGORY_CODE", type text}, {"SPECIES_CATEGORY", type text}, {"SPECIES_CODE", type text}, {"SPECIES", type text}, {"CATCH_UNIT_CODE", type text}, {"FATE_TYPE", type text}, {"FATE_CODE", type text}, {"FATE", type text}, {"CATCH",type number}}),
    ```
 
-5. Filter rows to only select years >= 2000: 
+8. Filter rows to only select years >= 2000: 
+
    ```powerquery
    SelecionarValores = Table.SelectRows(AlterarTipos, each [YEAR] >= StartYear),
    ```
 
-6. As the previous tables, added an index:
+10. As the previous tables, added an index:
+   
    ```powerquery
    Index = Table.AddIndexColumn(SelecionarValores,"Index", 1,1, Int64.Type),
    ```
 
-7. After the index, the fleet column required normalization. Firstly by taking out parenthesis:
+11. After the index, the fleet column required normalization. Firstly by taking out parenthesis:
    ```powerquery
    NormalizarFleet = Table.ReplaceValue(Table.ReplaceValue(Index, "(", "", Replacer.ReplaceText, {"FLEET"}), ")", "", Replacer.ReplaceText, {"FLEET"}),
    ```
 
-8. Secondly, by taking out the EU reference:
+11. Secondly, by taking out the EU reference:
+   
    ```powerquery
    NormalizarEU = Table.TransformColumns(NormalizarFleet, {{"FLEET", each if Text.Contains(Text.Trim(_), "EU") then Text.AfterDelimiter(_," ") else _, type text}}),
    ```
 
-9. An EU identifier column is added to allow EU fleet analysis with normalized fleet column:
+11. An EU identifier column is added to allow EU fleet analysis with normalized fleet column:
+
     ```powerquery
      AdicionarIdentificadorEU = Table.AddColumn(NormalizarEU, "EU Fleet", each if Text.Contains([FLEET_CODE], "EU") then "Yes" else "No", type text),
     ```
 
-10. The original table had quarters and years as time-related columns. A QuarterYear key was added to allow for analysis at that granularity level and to connect to the QuarterYear key in the Dim_Date table.
+13. The original table had quarters and years as time-related columns. A QuarterYear key was added to allow for analysis at that granularity level and to connect to the QuarterYear key in the Dim_Date table.
+
     ```powerquery
     AdicionarChaveQuarterYear = Table.AddColumn(AdicionarIdentificadorEU, "YEARQUARTER", each  Text.From([YEAR]) & [QUARTER], type text),
     ```
 
-11. Lastly, the columns were reordered.
+15. Lastly, the columns were reordered.
+
     ```powerquery
     ReordenarColunas = Table.ReorderColumns(AdicionarChaveQuarterYear, {"Index","YEAR", "QUARTER","YEARQUARTER", "FISHING_GROUND_CODE", "FLEET_CODE", "FLEET", "EU Fleet","FISHERY_TYPE_CODE", "FISHERY_TYPE", "FISHERY_GROUP_CODE", "FISHERY_GROUP", "FISHERY_CODE", "FISHERY", "GEAR_CODE", "GEAR", "EFFORT_SCHOOL_TYPE_CODE", "CATCH_SCHOOL_TYPE_CODE", "EFFORT", "EFFORT_UNIT_CODE", "SPECIES_CATEGORY_CODE", "SPECIES_CATEGORY", "SPECIES_CODE", "SPECIES", "CATCH_UNIT_CODE", "FATE_TYPE", "FATE_CODE", "FATE", "CATCH"})
     ```

@@ -26,7 +26,7 @@ The Claude Manuals are available for download in main.
   - Origin: https://iotc.org/data/datasets/Retained catches by year, main IOTC area, fleet, and gear for all IOTC and bycatch species
   - Connection type: Csv with with parameter RC-SCI_1950-2024_PATH
     
-    ```
+    ```powerquery
     Fonte = Csv.Document(File.Contents(#"RC-SCI_1950-2024_PATH"))
     ``` 
 
@@ -36,7 +36,7 @@ The Claude Manuals are available for download in main.
   - Origin: https://iotc.org/data/datasets/Annual Number of Vessels by Fishing Fleet, Gear, Architecture, Mechanisation type, Size class, and Fish Preservation Method (Fishing Craft Statistics)
   - Connector type: Csv with parameter Conexao Pasta as Folder Connector.
     
-     ```
+     ```powerquery
      Fonte = Csv.Document(File.Contents(#"Conexao Pasta" & "\IOTC-DATASETS-2026-02-23-CE-1952-2024.csv"))
      ``` 
    
@@ -46,7 +46,7 @@ The Claude Manuals are available for download in main.
   - Origin: https://iotc.org/data/datasets/latest/CE/All
   - Connector type: Csv with parameter parameter Conexao Pasta as Folder Connector.
     
-     ```
+     ```powerquery
      Fonte = Csv.Document(File.Contents(#"Conexao Pasta" & "\IOTC-DATASETS-2026-02-23-CE-1952-2024.csv")),
      ``` 
 
@@ -56,7 +56,7 @@ The Claude Manuals are available for download in main.
   - Origin: https://iotc.org/data/datasets/latest/SD/TUNAS
   - Connector type: Csv with parameter Fish_Prices_Excel_Path.
     
-    ```
+    ```powerquery
     Fonte = Excel.Workbook(File.Contents(#"Fish_Prices_Excel_Path")),
     ``` 
 
@@ -66,7 +66,7 @@ The Claude Manuals are available for download in main.
   - Origin: https://iotc.org/data/datasets/latest/SD/FUEL
   -  Connector type: Csv with parameter  Crude_Oil_Prices_Excel_Path.
     
-      ```
+      ```powerquery
       Fonte = Excel.Workbook(File.Contents(Crude_Oil_Prices_Excel_Path)),
       ```
       
@@ -76,7 +76,7 @@ The Claude Manuals are available for download in main.
   - Origin: https://data.iotc.org/reference/latest/domain/admin/#geospatialData
   - Connector type: Csv with parameter Geographical_Data_Connection.
     
-     ```
+     ```powerquery
      Fonte = Csv.Document(File.Contents(Geographical_Data_Connection)),
      ``` 
  
@@ -110,63 +110,63 @@ The use of parameters is preferred has it handles changes in source locations mo
       
 2. Selecting only records >= year 2000:
    
-    ```
+    ```powerquery
     SelecionarLinhas = Table.SelectRows(UniformizaçãoTitulos, each [Year]>=StartYear),
     
     ``` 
 
 3. Adding index to allow for running totals and previous-rows calculations, ordered operations and increase table relationship performance:
    
-    ```
+    ```powerquery
     Index = Table.AddIndexColumn(SelecionarLinhas,"Index",1,1, Int64.Type),
     ```
 
 4. To normalize the country(fleet) data,  as for exemple could be presented as EU.Portugal, the following was done:
    
-    ```
+    ```powerquery
      NormalizarTaiwan = Table.TransformColumns( Index, {{"Fleet", each if Text.Contains(Text.Trim(_),"Taiwan,China") then Text.BeforeDelimiter(_,"," ) else _, type text}}),
     NormalizarEU = Table.ReplaceValue(Table.TransformColumns(NormalizarTaiwan, {{"Fleet", each if Text.Contains(Text.Trim(_), "EU") then Text.AfterDelimiter(_,"(") else _, type text}}), ")","", Replacer.ReplaceText, {"Fleet"}),
     ```
 
 5. Some fleets referenced specific regions that constituted different fleets, as for example French Polynesia, and to properly analyze those, specifically, a SubFleet column was added:
    
-    ```
+    ```powerquery
      AdicionarSubFleet = Table.AddColumn(NormalizarEU, "SubFleet", each if Text.Contains(Text.Trim([Fleet]), ",") then Text.AfterDelimiter([Fleet], ",") else "", type text),
     ```
     
 6. Handling nulls in SubFleet:
     
-    ```
+    ```powerquery
      SubstituirNullsSubFleet = Table.ReplaceValue(AdicionarSubFleet, "", "Not applicable", Replacer.ReplaceValue, {"SubFleet"}),
     ```
 
 7. Normalize fleet column after extracting subregions
     
-    ```
+    ```powerquery
     NormalizarFleet = Table.TransformColumns(SubstituirNullsSubFleet,{{"Fleet",each  if Text.Contains(_,",") then Text.BeforeDelimiter(_,",") else _, type text}}),
     ´´´
 
 8. Normalize NEI values in the fleet column (NEI respects to data of extinct or not known enttities):
     
-    ```
+    ```powerquery
     NormalizarNEI =  Table.ReplaceValue(NormalizarFleet, "(","", Replacer.ReplaceText, {"Fleet"}),
     ```
 
 9. Adding EU indicator: If country is part of the EU, then Yes, else No (This is relevant because the EU manages fisheries has a block through the EU's Common Fisheries Policy):
     
-    ```
+    ```powerquery
     AdicionarIdentificadorEU = Table.AddColumn(NormalizarNEI, "EU Fleet", each if Text.Contains([Fleet Code], "EU") then "Yes" else "No", type text),
     ```
 
 10. Round catch to normalize number of digits:
     
-    ```
+    ```powerquery
     ArrendondarCatch = Table.TransformColumns(AdicionarIdentificadorEU,{{"Catch Weight", each Number.Round(_,2), type number}}),
     ```
 
 11. Reorder columns:
     
-    ```
+    ```powerquery
     ReordenarColunas = Table.ReorderColumns(ArrendondarCatch, {"Index","Year","Fishing Ground Code","Fishing Ground","Fleet Code","Fleet","SubFleet","EU Fleet","Fishery Type Code","Fishery Type","Fishery Group Code","Fishery Group","Fishery Code","Fishery","Gear FAO Code", "Gear","Species Category Code","Species Category","Species Code", "Species Name", "Species Scientific Name",  "Fate Type Code", "Fate Type", "Fate Code", "Fate", "Catch Weight"})
     ```
 
@@ -179,7 +179,7 @@ The use of parameters is preferred has it handles changes in source locations mo
 1. Basic transformations: Promote headers, Remove Spaces, alter data types, column title uniformization:
    
     
-    ```
+    ```powerquery
     Fonte = Csv.Document(File.Contents(#"Fishing_Craft_Statistics_Path")),
     PromoverNomes = Table.PromoteHeaders(Fonte, [PromoteAllScalars = true]),
     RemoverEspaços = Table.TransformColumns(PromoverNomes, {}, Text.Trim),
@@ -190,24 +190,24 @@ The use of parameters is preferred has it handles changes in source locations mo
 
 2. Selecting only records >= year 2000:
    
-    ```
+    ```powerquery
     SelecionarLinhas = Table.SelectRows(AlterarTipos, each [Year]>=StartYear),
     ```
 3. Adding index:
    
-    ```
+    ```powerquery
     Index = Table.AddIndexColumn(SelecionarLinhas, "Index",1,1,Int64.Type),
     ```
 
 4. Normalize capital letters in the fleet column:
    
-    ```
+    ```powerquery
      ProperFleet = Table.TransformColumns(Index, {{"Fleet", each Text.Proper(_)}}),
     ```
 
 5. As the catch estimates fact table, the fleet data needed to be normalized to extract only the actual fleet:
    
-    ```
+    ```powerquery
     NormalizarTaiwan = Table.TransformColumns( ProperFleet, {{"Fleet", each if Text.Contains(Text.Trim(_),"Taiwan,China") then Text.BeforeDelimiter(_,"," ) else _, type text}}),
     NormalizarFleet = Table.ReplaceValue(NormalizarTaiwan, each [Fleet], each if Text.Contains(Text.Trim([Fleet]), ".") then   Text.Replace([Fleet], ".", " ") else [Fleet], Replacer.ReplaceValue, {"Fleet"}),
     NormalizarEU = Table.TransformColumns(NormalizarFleet, {{"Fleet", each if Text.Contains(Text.Trim(_), "Eu ") then Text.AfterDelimiter(_," ") else _, type text}}),
@@ -219,37 +219,249 @@ The use of parameters is preferred has it handles changes in source locations mo
 
 6. As well, the sub regions present in the fleet column needed to be extracted to normalize all fleet values:
    
-    ```
+    ```powerquery
  AdicionarSubFleet = Table.AddColumn(NormalizarEU, "SubFleet", each if Text.Contains(Text.Trim([Fleet]), " ") and Text.Contains(Text.Trim([Fleet Code]), "EU") or Text.Contains(Text.Trim([Fleet]), "Uk")   then Text.AfterDelimiter([Fleet], " ") else "", type text),
     SubstituirNullsSubFleet = Table.ReplaceValue(AdicionarSubFleet, "", "Not applicable", Replacer.ReplaceValue, {"SubFleet"}),
     ```
 
  7. The EU fleet required a second step after the first one to normalized correctly:
     
-   ```
+   ```powerquery
     NormalizarEU2 = Table.ReplaceValue(SubstituirNullsSubFleet, each [Fleet], each if Text.Contains(Text.Trim([Fleet Code]), "EU") then Text.BeforeDelimiter(_," ") else [Fleet], Replacer.ReplaceValue, {"Fleet"}),
    ```
 
 8. It also required a new correction to the data type:
    
-   ```
+   ```powerquery
    CorrigirTipoFleet = Table.TransformColumnTypes(NormalizarEU2, {{"Fleet", type text}}),
    ```
 
 10. Add EU Fleet identifier:
     
-   ```
+   ```powerquery
    AdicionarEUFleet = Table.AddColumn(CorrigirTipoFleet, "EU Fleet", each if Text.Contains(Text.Trim([Fleet Code]), "EU") then "Yes" else "No", type text),
    ```
    
 11. Finally, reorder columns on the Fleet_Statistics fact table. It contains 18 columns for now, as the dim description columns will be retired after the creation of the dim tables:
     
-   ```
+   ```powerquery
    ReordenarColunas = Table.ReorderColumns(AdicionarEUFleet, {"Index","Year","Fleet Code", "Fleet","SubFleet", "EU Fleet","Fishery Type Code", "Fishery Type", "Gear Code", "Gear FAO Code", "Gear", "Gear Group", "Class Lower Length",  "Class Upper Length", "Class Type Code", "Class Type", "Number of Vessels", "Fishing Grounds"})
    ```
 
 
-### 
+### Fishing_Effort (not imported to the model)
+
+1. As always, basic transformations were performed first:
+   
+   ```powerquery
+   Fonte = Csv.Document(File.Contents(#"Conexao Pasta" & "\IOTC-DATASETS-2026-02-23-CE-1952-2024.csv")),
+    PromoverTitulos = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true]),
+   ```
+
+2. Contrary to the previous tables, some columns were selected immediately to lower the size of the import and optimize subsequent transformations, as the columns left out were clearly not needed. To always select the same columns, applied a dynamic selection by creating a list, select the values of that list that were present in the columns names of the table, also converted as list, and selecting columns by referencing the original table with the PromoteHeaders and the list compared in the previous step:
+   ```powerquery
+   ColunasPretendidas = {"YEAR", "QUARTER", "FISHING_GROUND_CODE", "FLEET_CODE", "FLEET", "FISHERY_TYPE_CODE", "FISHERY_TYPE", "FISHERY_GROUP_CODE", "FISHERY_GROUP", "FISHERY_CODE", "FISHERY", "GEAR_CODE", "GEAR", "EFFORT_SCHOOL_TYPE_CODE", "CATCH_SCHOOL_TYPE_CODE", "EFFORT", "EFFORT_UNIT_CODE", "SPECIES_CATEGORY_CODE", "SPECIES_CATEGORY", "SPECIES_CODE", "SPECIES", "CATCH_UNIT_CODE", "FATE_TYPE", "FATE_CODE", "FATE", "CATCH"  },
+    ColunasPresentes = List.Select(ColunasPretendidas, each List.Contains(Table.ColumnNames(PromoverTitulos),_)),
+    SelecionarColunas = Table.SelectColumns(PromoverTitulos, ColunasPresentes),
+   ```
+
+3. Replace string values in catch column:
+   ```powerquery
+    AlterarNAColCatch = Table.ReplaceValue(SelecionarColunas, "NA", 0.0,Replacer.ReplaceValue, {"CATCH"}),
+   ```
+
+4. Basic transformation, alter column data types on the dynamically selected columns:
+   ```powerquery
+   AlterarTipos = Table.TransformColumnTypes(AlterarNAColCatch,{{"YEAR", type number}, {"QUARTER", type text}, {"FISHING_GROUND_CODE",type number}, {"FLEET_CODE", type text},{"FLEET", type text}, {"FISHERY_TYPE_CODE", type text}, {"FISHERY_TYPE", type text}, {"FISHERY_GROUP_CODE", type text}, {"FISHERY_GROUP", type text}, {"FISHERY_CODE", type text}, {"FISHERY", type text}, {"GEAR_CODE", type text}, {"GEAR", type text}, {"EFFORT_SCHOOL_TYPE_CODE",type text} , {"CATCH_SCHOOL_TYPE_CODE",type text},{"EFFORT",type number}, {"EFFORT_UNIT_CODE", type text}, {"SPECIES_CATEGORY_CODE", type text}, {"SPECIES_CATEGORY", type text}, {"SPECIES_CODE", type text}, {"SPECIES", type text}, {"CATCH_UNIT_CODE", type text}, {"FATE_TYPE", type text}, {"FATE_CODE", type text}, {"FATE", type text}, {"CATCH",type number}}),
+   ```
+
+5. Filter rows to only select years >= 2000: 
+   ```powerquery
+   SelecionarValores = Table.SelectRows(AlterarTipos, each [YEAR] >= StartYear),
+   ```
+
+6. As the previous tables, added an index:
+   ```powerquery
+   Index = Table.AddIndexColumn(SelecionarValores,"Index", 1,1, Int64.Type),
+   ```
+
+7. After the index, the fleet column required normalization. Firstly by taking out parenthesis:
+   ```powerquery
+   NormalizarFleet = Table.ReplaceValue(Table.ReplaceValue(Index, "(", "", Replacer.ReplaceText, {"FLEET"}), ")", "", Replacer.ReplaceText, {"FLEET"}),
+   ```
+
+8. Secondly, by taking out the EU reference:
+   ```powerquery
+   NormalizarEU = Table.TransformColumns(NormalizarFleet, {{"FLEET", each if Text.Contains(Text.Trim(_), "EU") then Text.AfterDelimiter(_," ") else _, type text}}),
+   ```
+
+9. An EU identifier column is added to allow EU fleet analysis with normalized fleet column:
+    ```powerquery
+     AdicionarIdentificadorEU = Table.AddColumn(NormalizarEU, "EU Fleet", each if Text.Contains([FLEET_CODE], "EU") then "Yes" else "No", type text),
+    ```
+
+10. The original table had quarters and years as time-related columns. A QuarterYear key was added to allow for analysis at that granularity level and to connect to the QuarterYear key in the Dim_Date table.
+    ```powerquery
+    AdicionarChaveQuarterYear = Table.AddColumn(AdicionarIdentificadorEU, "YEARQUARTER", each  Text.From([YEAR]) & [QUARTER], type text),
+    ```
+
+11. Lastly, the columns were reordered.
+    ```powerquery
+    ReordenarColunas = Table.ReorderColumns(AdicionarChaveQuarterYear, {"Index","YEAR", "QUARTER","YEARQUARTER", "FISHING_GROUND_CODE", "FLEET_CODE", "FLEET", "EU Fleet","FISHERY_TYPE_CODE", "FISHERY_TYPE", "FISHERY_GROUP_CODE", "FISHERY_GROUP", "FISHERY_CODE", "FISHERY", "GEAR_CODE", "GEAR", "EFFORT_SCHOOL_TYPE_CODE", "CATCH_SCHOOL_TYPE_CODE", "EFFORT", "EFFORT_UNIT_CODE", "SPECIES_CATEGORY_CODE", "SPECIES_CATEGORY", "SPECIES_CODE", "SPECIES", "CATCH_UNIT_CODE", "FATE_TYPE", "FATE_CODE", "FATE", "CATCH"})
+    ```
+
+These tables were left int he Other Queries folder - they are not directly imported. They are the basis for creating the dim tables. After those are created, they are buffered and the, as said earlier, the descriptive columns related to dims are removed before upload to the model.
+
+The tuna_import_prices, the crude_prices and the IOTC_major_geo_areas are imported and uploaded directly and are contained in the Queries to Upload folder inside Power Query.
+
+
+### Tuna Import Prices (Imported to the model)
+
+
+1.  The basic transformations required in this table are different. As the information was separated in various sheets with the same columns, those should be combined and exclude hidden sheets:
+   
+   ```powerquery
+   Fonte = Excel.Workbook(File.Contents(#"Fish_Prices_Excel_Path")),
+    FiltrarFolhasOcultas = Table.SelectRows(Fonte, each ([Kind] = "Sheet") and ([Hidden] = false)),
+    PromoverCabeçalhos = Table.TransformColumns(FiltrarFolhasOcultas, {{"Data", Table.PromoteHeaders}}),
+    CombinarFolhas = Table.Combine(PromoverCabeçalhos[Data]),
+   ```
+
+2. The data in the column PROVIDER wasn´t needed, so the column was removed:
+
+   ```powerquery
+    RemoverProvider = Table.RemoveColumns(CombinarFolhas, "PROVIDER"),
+   ```
+
+4. Another basic transformations were also required: change data types of columns, rename columns and handle nulls in quantitative columns:
+
+   ```powerquery
+   AlterarTipos = Table.TransformColumnTypes(RemoverProvider, {{"YEAR", type number}, {"MONTH", type number}, {"SOURCE", type text}, {"UNIT", type text},{"SKJ", type number}, {"YFT", type number}, {"BET", type number}, {"ALB", type number}}),
+    RenomearColunas = Table.RenameColumns(AlterarTipos, {{"YEAR", "Year"},{"MONTH", "Month"}, {"SOURCE", "Source"}, {"UNIT", "Unit"}}),
+    AlterarNulls = Table.ReplaceValue(RenomearColunas, null, 0.0, Replacer.ReplaceValue, {"SKJ","YFT", "BET", "ALB"}),
+   ```
+
+6. The price value columns required normalization on decimal values. As Table.TransformColumns reset the column data type, they should be explicitly declared:
+
+   ```powerquery
+   ArredondarValores = Table.TransformColumns(AlterarNulls, {{"SKJ", each Number.Round(_,2), type number},{"YFT", each Number.Round(_,2), type number}, {"BET",  each Number.Round(_,2), type number}, {"ALB",  each Number.Round(_,2), type number}}),
+   ```
+
+8. Next, a less straightforward transformation was required. To be able to do meaningful analysis, the dimensions contained in the source column needed to be separated. They contained fish condition, gear used, product market and geographical import/export market. The source column was separated into Fisheries, Market Description, Fish Condition and gear columns. These transformations were encapsulated in a nested let...in statement:
+
+    ```powerquery
+   AdicionarColunasCategoricas = let 
+        AdicionarTipoPescaria = Table.AddColumn(ArredondarValores, "Fisheries" , each Text.Split(Text.Trim([Source]), "|"){0}, type text),
+        AdicionarDescricaoMercado = Table.AddColumn(AdicionarTipoPescaria, "Market Description", each Text.Split(Text.Trim([Source]), "|"){1}, type text),
+        AdicionarEstadoPescado = Table.AddColumn(AdicionarDescricaoMercado, "Fish Condition", each Text.Split(Text.Trim([Fisheries]), " "){0}, type text ),
+        AdicionarAparelhoCaptura =  Table.AddColumn(AdicionarEstadoPescado, "Gear", each Text.AfterDelimiter(Text.Trim([Fisheries])," ", 0), type text ),
+   ```
+
+10. The next transformations done inside the nested let...in statement were simpler, normalizing the data inside the gear column, remove now redundant columns and reorder the resulting columns:
+   
+   ```powerquery
+   AdicionarMaiusculas = Table.TransformColumns(AdicionarAparelhoCaptura, {{"Gear", each Text.Proper(_), type text}}),
+        RemoverColunas = Table.RemoveColumns(AdicionarMaiusculas, {"Source", "Fisheries"}),
+        ReordenarColunas = Table.ReorderColumns(RemoverColunas, {"Year", "Month", "Market Description" ,"Fish Condition", "Gear", "Unit", "SKJ", "YFT", "BET", "ALB"})
+    in 
+    ReordenarColunas,
+   ```
+
+
+11. The next transformation required several tries. Tried Table.ReplaceValue in several ways and never worked properly, as i needed to iterate each row to normalized the values of weight ie where tons then / 1000 to bring down to kilos. The only way it worked was using List.Accumulate, which allows to alter values based on conditions row by row and only alter when value meet conditions, otherwise maintaining the previous state:
+
+    ```powerquery
+    UniformizarPreços_TonsParaKgs = List.Accumulate({"SKJ", "YFT", "BET", "ALB"}, AdicionarColunasCategoricas,  (state,current) => Table.ReplaceValue ( state, each Record.Field(_,current), each if [Unit] = "USD per tonne" and Record.Field(_,current) <> 0.0 then Record.Field(_,current) / 1000 
+        else Record.Field(_,current), Replacer.ReplaceValue, {current})),
+    ```
+
+12. The value description column also needed uniformization row by row, from  tonne to kgs:
+
+    ```powerquery
+    UniformizarUnit = Table.ReplaceValue(UniformizarPreços_TonsParaKgs, "USD per tonne", "USD per kg", Replacer.ReplaceValue, {"Unit"}),
+    ```
+
+14. The next normalization task concerned currency normalization, as the Japanese prices were in Yen. For a meaningful comparison, these values needed to be converted to USD (the converting values ca be found here: https://www.federalreserve.gov/RELEASES/H10/hist/dat00_ja.htm):
+
+    ```powerquery
+    ConvertYen =  List.Accumulate({"SKJ", "YFT", "BET", "ALB"}, UniformizarUnit, (state,current) => Table.ReplaceValue ( state, each Record.Field(_,current), each if [Unit] = "YEN per kg" and Record.Field(_,current) <> 0.0 then Record.Field(_,current) * 0.0063
+        else Record.Field(_,current), Replacer.ReplaceValue, {current})),
+    UniformizarUnitYENtoUSD = Table.ReplaceValue(ConvertYen, "YEN per kg", "USD per kg", Replacer.ReplaceValue, {"Unit"}),
+    ```
+
+16. As with the previous tables, the rows which year >= 2000 were selected:
+
+    ```powerquery
+    SelecionarLinhas = Table.SelectRows(UniformizarUnitYENtoUSD, each [Year]>=StartYear),
+    ```
+
+18. Next, we unpivot the columns added in the nested let...in statement. UnpivotOtherColumns is preferable to NpivotColumns because, if new columns are added to the source table, the transformation picks them up automatically:
+ 
+    ```powerquery
+    UnpivotColunas = Table.UnpivotOtherColumns(SelecionarLinhas,{"Year", "Month", "Market Description","Fish Condition", "Gear", "Unit"}, "Species Code", "Price per kg"),
+    ```
+
+
+19. The last transformation on the Tubna_Import_Prices table are the explicit definition of the column type for the Price per kg column, adding an YearMonth key and finally reorder de columns:
+
+    ```powerquery 
+    DefinirTipoValCol = Table.TransformColumnTypes(UnpivotColunas, {{"Price per kg", type number}}),
+    AdicionarYearMonth = Table.AddColumn(DefinirTipoValCol, "YearMonth", each [Year]*100 + [Month], type number),
+    ReordenarColunas = Table.ReorderColumns(AdicionarYearMonth, {"Year", "Month","YearMonth" ,"Market Description" ,"Fish Condition", "Gear", "Unit", "Species Code", "Price per kg"})
+    ```
+
+
+### Crude_Prices (Imported to the model)
+
+
+1. Similarly to the previous table, the crude_prices source csv contained several sheets, albeit we only need one. The first transformations are to open that sheet:
+
+   ```powerquery
+   Fonte = Excel.Workbook(File.Contents(Crude_Oil_Prices_Excel_Path)),
+    FiltrarFolhasOcultas = Table.SelectRows(Fonte, each ([Kind] = "Sheet") and ([Hidden] = false)),
+    AbrirFolha = FiltrarFolhasOcultas { [Item = "FUEL | CRUDE OIL SPOT", Kind = "Sheet"]}[Data],
+   ```
+
+2. Several basic transformations were performed after opening the sheet, promote headers, remove the redundant provider column, correct the cost column title, explicitly change data types and round the quantitative cost column. As the last transformation uses the TransformColumn, the column data type needs to be explicitly stated (i always forget these):
+
+   ```powerquery
+   PromoverCabeçalhos = Table.PromoteHeaders(AbrirFolha, [PromoteAllScallar=true]),
+    RemoverColuna = Table.RemoveColumns(PromoverCabeçalhos, {"PROVIDER"}),
+    AlterarTitulo = Table.RenameColumns(RemoverColuna, {"COS", "COST"}),
+    AlterarTipo = Table.TransformColumnTypes(AlterarTitulo, {{"YEAR", type number}, {"MONTH", type number}, {"SOURCE", type text}, {"UNIT", type text}, {"COST", type number}}),
+    ArrendondarCusto = Table.TransformColumns(AlterarTipo, {{"COST", each Number.Round(_, 2), type number}}),
+   ```
+
+3. The rows >= year 2000 were filtered:
+
+   ```powerquery
+    SelecionarLinhas = Table.SelectRows(ArrendondarCusto, each [YEAR] >= StartYear),
+   ```
+
+4. After that, the current time columns available were used to add Quarter, QuarterYear and YearMonth Columns:
+
+   ```powerquery
+   AdicionarQuarter = Table.AddColumn(SelecionarLinhas, "QUARTER", each if [MONTH] <= 3 then "Q1" else if [MONTH] <= 6 then "Q2" else if [MONTH] >= 9 then "Q3" else "Q4", type text),
+    AdicionarYearQuarter = Table.AddColumn(AdicionarQuarter, "YearQuarter", each Text.From([YEAR]) & [QUARTER], type text),
+    AdicionarYearMonth = Table.AddColumn(AdicionarYearQuarter, "YearMonth", each Text.From([YEAR]) & Text.From([MONTH]), type text),
+   ```
+
+5. Finally, the columns were reordered:
+
+   ```powerquery
+   ReordenarColunas = Table.ReorderColumns(AdicionarYearMonth, {"YEAR", "MONTH", "YearMonth", "YearQuarter", "SOURCE", "UNIT", "COST"})
+   ```
+
+
+After these tables, the Dim tables were built from the categorical data contained in the fact tables described above. All Dim tables were organized in the Dimensions folder in Power Query Editor. 
+
+### Dim_Species (Imported to model):
+
+
+
+
+
+
    
 
   

@@ -103,7 +103,7 @@ The use of parameters is preferred has it handles changes in source locations mo
 ## Fact Tables:
 
 
-### Catch_Estimates (not imported to the model)
+### Catch_Estimates (staging, not imported to the model)
 
 1. Basic transformations: Promote headers, Remove Spaces, alter data types, column title uniformization:
 
@@ -180,7 +180,7 @@ The use of parameters is preferred has it handles changes in source locations mo
 
 
 
-### Fleet_Statistics (not imported to the model):
+### Fleet_Statistics (staging, not imported to the model):
 
 
 1. Basic transformations: Promote headers, Remove Spaces, alter data types, column title uniformization:
@@ -257,7 +257,7 @@ The use of parameters is preferred has it handles changes in source locations mo
 
 
 
-### Fishing_Effort (not imported to the model)
+### Fishing_Effort (staging, not imported to the model)
 
 1. As always, basic transformations were performed first:
 
@@ -476,10 +476,238 @@ After these tables, the Dim tables were built from the categorical data containe
 
 
 
-### Dim_Species (Imported to model):
+### Dim_Date (Imported to model):
 
 
-1. 
+1. Dim_Date M Code is widely available online and in the Power Query M Manual uploaded in Manuals a full date table in m is available, so just a quick explanation. Simply define a initial and end date, define the culture in which the dates and names are to be presented and counted, use Duration.Days to count the different dates in the range. Then utilize List.Dates to use that initial date and counting of dates to produce a list of dates corresponding to that initial date and subsequent dates contained in the counting. From that list, create a table, define the type date for the column date and from there add transformations to define months, quarters, names for days, months and so on. Finally, define the YearMonth and YearQuarter, in this case. 
+
+   ```powerquery
+   let
+    DataInicial = #date(2000,1,1),
+    DataFinal = #date(2030,1,1),
+    Cultura = "en-EN",
+    ContagemDias = Duration.Days(DataFinal-DataInicial)+1,
+    ListaDias = List.Dates(DataInicial , ContagemDias, #duration(1,0,0,0)),
+    TabelaDias = Table.FromList(ListaDias, Splitter.SplitByNothing(),{"Date"}),
+    DefinirTipo = Table.TransformColumnTypes(TabelaDias, {{"Date", type date}}),
+    AdicionarAno = Table.AddColumn(DefinirTipo, "Year", each Date.Year([Date]), Int64.Type),
+    AdicionarTrimestre = Table.AddColumn(AdicionarAno, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date])), type text),
+    AdicionarDia = Table.AddColumn(AdicionarTrimestre, "Day Number", each Date.Day([Date]), Int64.Type),
+    AdicionarMes = Table.AddColumn(AdicionarDia, "Month Number", each Date.Month([Date]), Int64.Type),
+    AdicionarNomeMes = Table.AddColumn(AdicionarMes, "Month Name", each Date.MonthName([Date]), type text ),
+    AdicionarNomeDia = Table.AddColumn(AdicionarNomeMes, "Day Name", each Date.DayOfWeekName([Date]), type text),
+    AdicionarYearMonth = Table.AddColumn(AdicionarNomeDia, "YearMonth", each [Year]*100+[Month Number], Int64.Type),
+    AdicionarYearQuarter = Table.AddColumn(AdicionarYearMonth, "YearQuarter", each Text.From([Year]) & [Quarter], type text),
+    ReordenarColunas = Table.ReorderColumns(AdicionarYearQuarter, {"Date", "Day Number", "Day Name", "Month Number", "Month Name", "Quarter", "Year", "YearMonth", "YearQuarter"})
+    in
+    ReordenarColunas
+   ```
+
+
+### Dim_Species (Imported to the model)
+
+1. Initially, the code to define the dim_species table was solely based on the Catch_Estimates imported table, using a dynamic selection of column names, select those columns with Table.SelectColumns, Table.Distinct to select only the distinct dimensional values, adding an index column  and finally reordering the columns.
+
+2. However, when reached the visualization phase, there was a blank value appearing that should no exist. The measures used were related to the Fishing_Effort fact table, indicating that were values present in this table that were not present in the Catch_Estimates table. Therefore, after some head-banging, the solution found was to do the process described above and combine the resulting tables. This was possible because the same columns were present in the fact tables. Tried nested joins but the performance was worse than combining tables, which was achived more quicly.
+
+3. First, selected the columns from Catch_Estimate, dinamically:
+
+   ```powerquery
+   ColunasPretendidas = {"Species Category Code", "Species Category", "Species Code", "Species Name"},
+    VerificarColunas = List.Select(ColunasPretendidas, each List.Contains(Table.ColumnNames(Catch_Estimates),_)),
+    SelecionarColunas = Table.SelectColumns(Catch_Estimates, VerificarColunas),
+   ```
+
+5. Secondly, select the same columns from the Fishing_Effort Table:
+
+   ```powerquery
+   ColunasPretendidasEffort= {"SPECIES_CATEGORY_CODE", "SPECIES_CATEGORY", "SPECIES_CODE", "SPECIES"},
+    VerificarColunasEffort= List.Select(ColunasPretendidasEffort, each List.Contains(Table.ColumnNames(Fishing_Effort),_)),
+    SelecionarColunasEffort = Table.SelectColumns(Fishing_Effort, VerificarColunasEffort),
+   ```
+
+6. As the columns titles were writen differently, required normalization:
+  
+   ```powerquery
+   UniformizarColunas = Table.RenameColumns(SelecionarColunasEffort, {{"SPECIES_CATEGORY_CODE","Species Category Code"}, {"SPECIES_CATEGORY", "Species Category"}, {"SPECIES_CODE", "Species Code"}, {"SPECIES", "Species Name"}}),
+   ```
+
+7. Then the two resulting tables were combined:
+
+   ```powerquery
+   CombinarTabelas = Table.Combine({SelecionarColunas, UniformizarColunas}),
+   ```
+
+8. To make it a dimension table, distinct values were filtered:
+
+   ```powerquery
+    SelecionarDistintos = Table.Distinct(CombinarTabelas, {"Species Code"}),
+   ```
+
+9. As the previous tables, an index column is added:
+
+   ```powerquery
+   Index= Table.AddIndexColumn(SelecionarDistintos, "Index", 1, 1, Int64.Type),
+   ```
+
+11. Lastly, the columns were reordered:
+
+    ```powerquery
+    ReordenarColunas = Table.ReorderColumns(Index, {"Index", "Species Code", "Species Name", "Species Category Code", "Species Category"})
+    ```
+
+
+
+### Dim_Fisheries&Gear (Imported to the model)
+
+
+1. The same problem that arose during the report phase for the Dim_Species arose here as well. Applied the same initial procedure and, as the source columns were the same, applied the same solution when the blanks appeared in visualizations for metrics measuring Gear and Fisheries.
+
+2. The only difference was, after analyzing the resulting table, the values with NA string that came from the fishing effort table needed to be normalized to "Not specified".
+
+3. The complete code is:
+
+   ```powerquery
+   let
+    
+    ColunasPretendidas = {"Fishery Type Code", "Fishery Type", "Fishery Group Code", "Fishery Group", "Fishery Code", "Fishery", "Gear FAO Code", "Gear"},
+    VerificarColunas = List.Select(ColunasPretendidas, each List.Contains(Table.ColumnNames(Catch_Estimates), _)),
+    SelecionarColunas = Table.SelectColumns(Catch_Estimates, VerificarColunas),
+    ColunasPretendidasEffort = {"GEAR_CODE", "GEAR", "FISHERY", "FISHERY_CODE", "FISHERY_GROUP", "FISHERY_GROUP_CODE", "FISHERY_TYPE", "FISHERY_TYPE_CODE"},
+    VerificarColunasEffort = List.Select(ColunasPretendidasEffort, each List.Contains(Table.ColumnNames(Fishing_Effort), _)),
+    SelecionarColunasEffort = Table.SelectColumns(Fishing_Effort,VerificarColunasEffort),
+    UniformizarNomesColunas = Table.RenameColumns(SelecionarColunasEffort, {{"GEAR_CODE", "Gear FAO Code"},{"GEAR", "Gear"},{"FISHERY", "Fishery"},{"FISHERY_CODE", "Fishery Code"},{"FISHERY_GROUP", "Fishery Group"},{"FISHERY_GROUP_CODE", "Fishery Group Code"},{"FISHERY_TYPE", "Fishery Type"},{"FISHERY_TYPE_CODE", "Fishery Type Code"}}),
+    CombinarCatcheEffort  = Table.Combine({ SelecionarColunas, UniformizarNomesColunas}),
+    SelecionarDistintos = Table.Distinct(CombinarCatcheEffort, {"Gear FAO Code"}),
+    Index = Table.AddIndexColumn(SelecionarDistintos, "Index", 1, 1, Int64.Type),
+    ReordenarColunas = Table.ReorderColumns(Index, {"Index", "Gear", "Gear FAO Code", "Fishery", "Fishery Code", "Fishery Group", "Fishery Group Code", "Fishery Type", "Fishery Type Code"}),
+    TratarNulls = Table.ReplaceValue(ReordenarColunas, "NA", "Not specified", Replacer.ReplaceValue, {"Gear", "Gear FAO Code"})
+
+    in
+    TratarNulls
+   ```
+
+
+
+### Dim_Fleet (Imported to the model)
+
+
+1. As with the previous dim tables, the initial transformations resulted in mismatches in the report phase. When analysing the distinct values in the fleet column in the catch and fleet statistics fact tables, there was a difference of 7 values (54 vs 47). Therefore, the same process was applied here, with the difference that a nested join was used to bring to the nested table column the values not present in the left table. In this case, the Fleet_Statistics table:
+
+   ```powerquery
+   Catch_Estimates = Table.Buffer(Catch_Estimates),
+    SelecionarColunas = Table.SelectColumns(Catch_Estimates, {"Fleet Code", "Fleet", "SubFleet", "EU Fleet"}),
+    SelecionarDistintos = Table.Distinct(SelecionarColunas, {"Fleet Code"}),
+    UniraFleetStatistics = Table.NestedJoin(SelecionarDistintos, {"Fleet Code"}, Fleet_Statistics, {"Fleet Code"}, "Fleet_Joined", JoinKind.LeftOuter),
+    ExpandirColuna = Table.ExpandTableColumn(UniraFleetStatistics, "Fleet_Joined", {"Class Type Code", "Class Type"}),
+   ```
+
+2. After expanding the nested columns, null required handling in non-matched values:
+
+   ```powerquery
+   TratarNulls = Table.ReplaceValue(ExpandirColuna, null, "Not specified", Replacer.ReplaceValue, {"Class Type", "Class Type Code"}),
+   ```
+
+3. Next, only distinct values were kept:
+
+   ```powerquery
+   Deduplicar = Table.Distinct(TratarNulls, {"Fleet Code"}),
+   ```
+
+4. Finally, an index was added and the columns were reordered:
+
+   ```powerquery
+   Index = Table.AddIndexColumn(Deduplicar, "Index", 1, 1, Int64.Type),
+    ReordenarColunas = Table.ReorderColumns(Index, {"Index", "Fleet", "SubFleet", "Fleet Code", "Class Type", "Class Type Code", "EU Fleet"})
+   ```
+
+
+
+### Dim_Fate (Imported to the model)
+
+
+1. The creation of this table stemmed from my experience as an observer, as caught fish can have multiple destinations. Could be retained for landing and sale, could be discarded due to absence of quota, because a moratorium is applied to that species, it has depredation and is not in sale condition or could be used for crew consumption, for example. Although currently only holds one distinct value, future analysis could benefit greatly for an expanded collection on fate data.
+
+2. This is the simplest dimension table. Just applied a dynamic selection of columns, filtered distinct values, added an index and reordered columns.
+
+   ```powerquery
+   let
+    ColunasPretendidas = {"Fate Code", "Fate"},
+    VerificarColunas = List.Select(ColunasPretendidas, each List.Contains(Table.ColumnNames(Catch_Estimates),_)),
+    SelecionarColunas = Table.SelectColumns(Catch_Estimates, VerificarColunas),
+    AplicarDistinct = Table.Distinct(SelecionarColunas, {"Fate Code"}),
+    Index = Table.AddIndexColumn(AplicarDistinct, "Index", 1, 1, Int64.Type),
+    ReordenarColunas =  Table.ReorderColumns(Index, {"Index", "Fate", "Fate Code"})
+    in
+    ReordenarColunas
+
+   ```
+
+
+As mentioned before, after the creation of the Dimension Tables, the fact tables that were uploaded to the model were defined. This step consisted on excluding now redundant columns before upload.
+
+
+
+
+### Catch_Estimates_Model (uploaded to the model)
+
+
+1. First, the staging table was buffered:
+
+    ```powerquery
+   Fonte = Table.Buffer(Catch_Estimates),
+   ```
+
+2. Secondly, the now redundant columns were removed:
+
+   ```powerquery
+   RemoverColunas = Table.RemoveColumns(Fonte, {"Fishery Type", "Fishery Group", "Fishery", "Gear", "Fleet", "SubFleet", "Fate","Fate Type",  "Species Name", "Species Scientific Name", "Species Category"})
+   ```
+
+
+
+### Fleet_Statistics_Model  & Fishing_Effort_Model (uploaded to the model):
+
+
+1. The same transformations were applied to the other fact tables used in the model. The table Fleet_Statistics_Model was defined as:
+
+   ```powerquery
+   let
+    Fonte = Table.Buffer(Fleet_Statistics),
+    RemoverColunas = Table.RemoveColumns(Fonte, {"Fishery Type", "Fleet", "SubFleet", "Class Type", "Gear", "Gear Code"})
+    in
+    RemoverColunas
+   ```
+
+2. The Fishing Effort Model was defined in the same way:
+
+   ```powerquery
+   let
+    Fonte = Table.Buffer(Fishing_Effort),
+    RemoverColunas = Table.RemoveColumns(Fonte, {"FLEET", "EU Fleet", "FISHERY_TYPE", "FISHERY_GROUP", "FISHERY", "GEAR", "SPECIES_CATEGORY", "SPECIES", "FATE", "FATE_TYPE"})
+    in
+    RemoverColunas
+   ```
+
+
+
+This ends the Data Preparation phase.
+   
+
+
+
+
+
+
+   
+
+   
+   
+
+
+
+
+   
 
 
 

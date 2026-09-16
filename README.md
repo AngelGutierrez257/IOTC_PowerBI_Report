@@ -763,13 +763,13 @@ The resulting data model is a multi-fact star-schema with multiple one to many (
 
 1. A What-If Parameter, named FuelPriceMultiplier and with rang from 0.5 to 3.0 and increments of 0.1,  was develop to model the impact of crude oil prices on BET stocks (used as example of an what-if parameter).
 
-   ```dax
+   ```sql
    FuelPriceMultiplier = GENERATESERIES(0.5, 3, 0.1)
    ```
 
 2. The FuelPriceMultiplier Value is defined as:
 
-   ```dax
+   ```sql
     FuelPriceMultiplier Value = SELECTEDVALUE('FuelPriceMultiplier'[FuelPriceMultiplier], 1)
    ```
    
@@ -784,10 +784,50 @@ This parameter will be used on the measures applied in the last report page.
 As dax measures and visuals are intimately related, they are explained together to make their use and connection as clear as possible.
 
 
+
 ### Page 1 - IOTC Dashboard
 
 1. Contains general visuals that allow to have a glance on total catches, total catches per year, its distribution by min fisheries types, the top ten fleets by catches and the distribution of catches per year and species category:
 ![IOTC Model](<assets/- IOTC Report Dashboard.png>)
+
+
+2. The most basic measure, and one that is the basis of almost all calculations, is the [Catch in Tons], which provide a basic sum of catch that can be filtered:
+
+   ```sql
+     Catch in Tons = DIVIDE(SUM(Catch_Estimates_Model[Catch Weight]),1000,0)
+   ```
+
+3. The card visual makes use of the [Total Catches] measure, which use REMOVEFILTERS() instead of ALL(). REMOVEFILTERS is more explicit and is not a table valued function, so no temp tables, and is used inside CALCULATE, ensuring correct context transition:
+
+   ```sql
+     Total Catches = CALCULATE([Catch in Tons],  REMOVEFILTERS())
+   ```
+
+4. The catch in tons by year line chart, that shows the evolution of total catch in tons throughout the years, uses the  [Catch in Tons] measure in the y-axis and the Dim_Date[Year] column in the x-axis.
+
+5. The donut chart uses the same measure as the line chart, filtered by the Dim_Fisheries&Gear[Fishery Type] column in the legend.
+
+6. Two slicers were applied, one filtering by Dim_Date[Year] and the other by Dim_Species[Species Category].
+
+7. The stacked area chart, titled Catch in Tons by Year and Species Category, uses the column Dim_Date[Year] in the x-axis, the column Dim_Species[Species Category] in the Legend and the [Catch in Tons] measure in the y-axis.
+
+8. The last visualization shows the ranking of the top 10 fleets by total catch, aggregating all years. The stacked bar chart has the Dim_Fleet[Fleet] column in the y-axis and the measure [TOP 10 Fleet by Catch] in the x-axis. The measure is as follows:
+
+   ```sql
+   TOP 10 Fleet by Catch = CALCULATE([Catch in Tons], TOPN(10,VALUES(Dim_Fleet[Fleet Code]),[Catch in Tons],DESC))
+   ```
+   where the topn function returns the 10 highest (desc) values returned by the expression([Catch in Tons]), with VALUES returning unique values under the filter context created by calculate.
+
+
+
+### Page 2 - Map Distribution of Catches
+
+1. This page has a map visualization and a filter and allows to analyse the total catch in tons caught (or declared) in eastern or western areas of the IOTC regulatory area by species.
+
+2. ![IOTC Model](<assets/- page 01 - catches by IOTC macro-region.png>)
+
+3. The map vizualization uses the Dim_Species[Species Name] column in the legend well, the IOTC_Major_Geo_Areas[center_lat] column in the latitude well, the IOTC_Major_Geo_Areas[center_lon] in the longitude well, the  [Catch in Tons] measure in the bubble size well and the IOTC_Major_Geo_Areas[First name_en] in the tooltips. For the slicer, the Dim_Species[Species Name] column was used, presented as a vertical list.
+
    
 
 

@@ -701,7 +701,7 @@ This ends the Data Preparation phase.
 The resulting data model is a multi-fact star-schema with multiple one to many (1 : *) relationships from dimensional tables to the fact tables. Bridge tables were calculated in DAX, which will be described below. 
 
 ### Data Model Diagram:
-![IOTC Model](<assets/- IOTC Model.png>)
+![IOTC Model](<assets/- IOTC Model .png>)
 
 
 

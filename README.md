@@ -698,10 +698,102 @@ This ends the Data Preparation phase.
 
 ## Data Model
 
-The resulting data model is a multi-fact star-schema with multiple one to many (1 : *) relationships from dimensional tables to the fact tables. Bridge tables were calculated in DAX, which will be described below. 
+The resulting data model is a multi-fact star-schema with multiple one to many (1 : *) relationships from dimensional tables to the fact tables. Bridge tables were calculated in DAX (Dim_Year_Bridge,Dim_YearMonth_Bridge), as well tables for what-if analysis, and for measures  . They will be described below. 
+
+####Fact Tables: Catch_Estimates_Model, Fishing_Effort_Model, Fleet_Statistics_Model, Tuna_Import_Prices, Crude_Prices
+
+####Dimension Tables: Dim_Date, Dim_Fate, Dim_Fisheries&Gear, Dim_Fleet, Dim_Species, IOTC_Major_Geo_Areas, Dim_Year_Bridge, Dim_YearMonth_Bridge
 
 ### Data Model Diagram:
 ![IOTC Model](<assets/- IOTC Model .png>)
+
+
+
+
+### Relationships:
+
+1. Catch_Estimates_Model[Fate_Code] >>> Dim_Fate[Fate Code]; _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State:_ Active
+2. Catch_Estimates_Model[Fishing Group Code] >>> IOTC_Major_Geo_Areas[code]; _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Active
+3. Catch_Estimates_Model[Fleet Code] >>> Dim_Fleet[Fleet Code]; _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Active
+4. Catch_Estimates_Model[Gear FAO Code] >>> Dim_Fisheries&Gear[Gear FAO Code]; _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Active
+5. Catch_Estimates_Model[Species Code] >>> Dim_Species[Species Code]; _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Active
+6. Catch_Estimates_Model[Year] >>> Dim_Date[Date]; _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Inactive
+7. Catch_Estimates_Model[Year] >>> Dim_Year_Bridges[Year]; _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Active
+8. Crude_Prices[Year] >>> Dim_Date[Date]; _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Active
+9. Dim_Date[Year] >>> Dim_Year_Bridge[Year];  _Cardinality_: Many to one (*:1); _Filter Direction_: Both; _State_: Active
+10. Dim_Date[YearMonth] >>> Dim_YearMonth_Bridge[YearMonth];  _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Active
+11. Fishing_Effort_Model[FATE_CODE] >>> Dim_Fate[Fate Code];  _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Active
+12. Fishing_Effort_Model[FlEET_CODE] >>> Dim_Fleet[Fleet Code];  _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Active
+13. Fishing_Effort_Model[GEAR_CODE] >>> Dim_Fisheries&gear[Gear FAO Code];  _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Active
+14. Fishing_Effort_Model[SPECIES_CODE] >>> Dim_Species[Species Code];  _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Active
+15. Fishing_Effort_Model[YEAR] >>> Dim_Date[Date];  _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Inactive
+16. Fishing_Effort_Model[YEAR] >>> Dim_Year_Bridge[Year];  _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Active
+17. Fishing_Effort_Model[YEARQUARTER] >>> Dim_Date[Date];  _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Inactive
+18. Fleet_Statistics_Model[Fleet Code] >>> Dim_Fleet[Fleet Code];  _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Active
+19. Fleet_Statistics_Model[Gear FAO Code] >>> Dim_Fisheries&Gear[Gear FAO Code];  _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Active
+20. Fleet_Statistics_Model[Year] >>> Dim_Date[Date];  _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Active
+21. Tuna_Import_Prices[Species Code] >>> Dim_Species[Species Code];  _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Active
+22. Tuna_Import_Prices[YearMonth] >>> Dim_YearMonth_Bridge[Species Code];  _Cardinality_: Many to one (*:1); _Filter Direction_: Single; _State_: Active
+
+
+
+### Bridge Tables
+
+1. The **Dim_Year_Bridge**, connected to Catch_Estimates_Model, Tuna_Import_Prices and Fishing_Effort_Model, allowed to connect to fact tables with a granularity level of Year as the Dim_Date table has repeated values for years and produce correct time intelligence calculations. The DAX Code to create the new table is:
+
+   ```dax
+   Dim_Year_Bridge = DISTINCT(SELECTCOLUMNS(Dim_Date, "Year", Dim_Date[Year]))
+   ```
+
+2. The **Dim_YearMonth_Bridge**, connected to Tuna_Import_Prices, did the same for the connection between Dim_Date and Tuna_Import_prices, as the granularity level is the same. The DAX code for the Dim_YearMonth_Bridge is:
+
+   ```dax
+   Dim_YearMonth_Bridge = DISTINCT(SELECTCOLUMNS(Dim_Date, "YearMonth", Dim_Date[YearMonth]))
+   ```
+
+
+
+### Role-Playing Dimensions
+
+1. The only role-playing dimension is the Dim_Date, with the relationship Fishing_Effort_Model[YEARQUARTER] >>> Dim_Date[Date] and  Fishing_Effort_Model[YEAR] >>> Dim_Date[Date], both inactive.
+
+
+
+### Model Parameters
+
+1. A What-If Parameter, named FuelPriceMultiplier and with rang from 0.5 to 3.0 and increments of 0.1,  was develop to model the impact of crude oil prices on BET stocks (used as example of an what-if parameter).
+
+   ```dax
+   FuelPriceMultiplier = GENERATESERIES(0.5, 3, 0.1)
+   ```
+
+2. The FuelPriceMultiplier Value is defined as:
+
+   ```dax
+    FuelPriceMultiplier Value = SELECTEDVALUE('FuelPriceMultiplier'[FuelPriceMultiplier], 1)
+   ```
+   
+This parameter will be used on the measures applied in the last report page. 
+
+
+
+
+## Dax Measures & Visuals:
+
+
+As dax measures and visuals are intimately related, they are explained together to make their use and connection as clear as possible.
+
+
+### Page 1 - IOTC Dashboard
+
+1. Contains general visuals that allow to have a glance on total catches, total catches per year, its distribution by min fisheries types, the top ten fleets by catches and the distribution of catches per year and species category:
+![IOTC Model](<assets/- IOTC Report Dashboard.png>)
+   
+
+
+
+
+
 
 
 

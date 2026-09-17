@@ -781,7 +781,11 @@ This parameter will be used on the measures applied in the last report page.
 ## Dax Measures & Visuals:
 
 
-As dax measures and visuals are intimately related, they are explained together to make their use and connection as clear as possible.
+As dax measures and visuals are intimately related, they are explained together to make their use and connection as clear as possible. The measure table was created with:
+
+  ```sql
+  _Measures = {BLANK()}
+  ```
 
 
 
@@ -838,9 +842,258 @@ As dax measures and visuals are intimately related, they are explained together 
 
 ![IOTC Model](<assets/- page 02 - analysis of catch per unit effort per species.png>)
 
-3. 
+3. The basic measures used in this visual are the [Catch Per Unit Effort Longline] and [Catch Per Unit Effort Purse Seine]. Both required dividing the amount of catch caught with that gear types by the amount of effort employed with those gears, defined by the columns Dim_Fisheries&Gear[Fishery Group Code] and Fishing_Effort_Model[EFFORT_UNIT_CODE]. So, two variables were required to calculate both the catch amount and the amount of effort, maintaining the gear filter context. Then divide those variables to get the CPUE metric. Bellow are both measures:
+
+   ```sql
+   Catch Per Unit Effort Longline = var Catch = CALCULATE(sum(Catch_Estimates_Model[Catch Weight]), 'Dim_Fisheries&Gear'[Fishery Group Code] = "LL") var Effort = CALCULATE(sum(Fishing_Effort_Model[EFFORT]), 'Dim_Fisheries&Gear'[Fishery Group Code] = "LL", Fishing_Effort_Model[EFFORT_UNIT_CODE] = "HOOKS") return DIVIDE(Catch,Effort/1000, BLANK())
+
+   ```
+
+   ```sql
+    Catch Per Unit Effort Purse Seine = var Catch = CALCULATE(sum(Catch_Estimates_Model[Catch Weight]), KEEPFILTERS( 'Dim_Fisheries&Gear'[Fishery Group Code] = "PS")) var Effort =   CALCULATE(sum(Fishing_Effort_Model[EFFORT]), KEEPFILTERS('Dim_Fisheries&Gear'[Fishery Group Code] = "PS"),KEEPFILTERS( Fishing_Effort_Model[EFFORT_UNIT_CODE] in {"FDAYS", "DAYS","FHOURS","HOURS","NG","SETS","TRIPS","STDHR"})) return DIVIDE(Catch,Effort/1000, BLANK())
+
+   ```
+
+4.After CPUE being calculated, specific measures, filtered by each main commercial species was done and applied to the y-axis of the visual. In the x-axis, the Dim_Date[Year] column was used. The measures are the following:
+
+  ```sql
+  
+   SWO CPUE = CALCULATE([Catch Per Unit Effort Longline], Dim_Species[Species Code] = "SWO")
+
+   BSH CPUE = CALCULATE([Catch Per Unit Effort Longline], Dim_Species[Species Code] = "BSH")
+
+   BET CPUE = CALCULATE([Catch Per Unit Effort Longline], Dim_Species[Species Code] = "BET")
+
+   YFT CPUE = CALCULATE([Catch Per Unit Effort Longline], Dim_Species[Species Code] = "YFT")
+
+  ```
+
+5. the SKJ CPUE measure required a different approach. The simpler measure logic for other species was not working, so a workaround was needed to get the correct values. That consisted on calculating the amount of catch captured of skj and divide by the amount of units of effort:
+
+   ```sql
+   SKJ CPUE = DIVIDE(CALCULATE(sum(Catch_Estimates_Model[Catch Weight]), 'Dim_Fisheries&Gear'[Fishery Group Code] = "PS", Dim_Species[Species Code] = "SKJ"),CALCULATE(sum(Catch_Estimates_Model[Catch Weight]), 'Dim_Fisheries&Gear'[Fishery Group Code] = "PS", Fishing_Effort_Model[EFFORT_UNIT_CODE] in {"FDAYS", "DAYS","FHOURS","HOURS","NG","SETS","TRIPS","STDHR"}), BLANK())
+
+   ```
 
 
+
+### Page 4 - Fleet Analysis
+
+1. The fleet analysis page shows a matrix containing all relative % of catch for all fleets for each year. It also contains a slicer with tiles for easy selection of main gear type, allowing to analyse each fleet for each year and type of gear employed.
+
+![IOTC Model](<assets/- page 03 - catch fleet analysis.png>)
+
+2. The measure used in the values well of the matrix is [% of Catch by Fleet], that simply divides the catches in the present context filter by the total catches overall:
+
+   ```sql
+   % of Catch by Fleet = DIVIDE([Catch in Tons], CALCULATE([Total Catches], REMOVEFILTERS(Dim_Fleet)),0)
+
+   ```
+
+
+   
+### Page 5 - Catch Time Analysis 
+
+1. The catch time analysis page has 3 line visuals that show cumulative catches (Catches YTD by Year), the variation of catches in % by year related to the year before and a rolling 3 years catch average. It also contains 2 slicers with dropdown lists to analyse by species group and by fleet.
+
+![IOTC Model](<assets/- page 04 - catch time analysis.png>)
+
+2. The first line chart has the Dim_Date[Year] column in the x-axis and the measure [Catches YTD], that uses the TOTALYTD funtion (provides cumulative totals trough the years, filtered by the column Dim_Date[Date]):
+
+    ```sql
+   Catches YTD = TOTALYTD([Catch in Tons], Dim_Date[Date])
+
+   ```
+
+3. The second line chart shows the evolution of catch in % from the previous year. Uses Dim_Date[Year] in the x-axis and the measure [Catch Evolution YoY %] in the y-axis. This measure uses the measures [Catch Previous Year] and [Catch Evolution YoY] to calculate the %. The first measure to be calculated is [Catch Previous Year], that provides the corresponding value from the previous year:
+
+   ```sql
+   Catch Previous Year = CALCULATE([Catch in Tons], PREVIOUSYEAR(Dim_Date[Date]))
+
+   ```
+
+4. The second measure, [Catch Evolution YoY], simply subtracts the catch in tons under the current filter context to the catch from previous year:
+
+   ```sql
+   Catch Evolution YoY = [Catch in Tons] - [Catch Previous Year]
+
+   ```
+
+5. Finally, both measures are used in the [Catch Evolution YoY %], defining as % in the measure tools UI of the report view:
+
+   ```sql
+   Catch Evolution YoY % = DIVIDE([Catch Evolution YoY], [Catch Previous Year], BLANK())
+
+   ```
+
+6. The third visualization, Rolling 3 years catch avg, allows to see medium term macro tendencies in catch volumes. As the previous charts, uses Dim_Date[Year] in the x-axis and the measure [Rolling 3 Years Catch Avg] in the y-axis. the measure calculates the rolling average using the basic measure (expression) [Catch in Tons] and utilizing the DATESINPERIOD function to calculate the catch value from the previous 3 years conting from the last date available for the applied filter contexct:
+
+   ```sql
+     Rolling 3 Years Catch Avg = CALCULATE([Catch in Tons], DATESINPERIOD(Dim_Date[Date], LASTDATE(Dim_Date[Date]),-3,YEAR))
+
+   ```
+
+
+   
+### Page 6 - Catch Ranking Analysis
+
+1. The catch ranking analysis page contains a matrix with all fleets ranked by catch and by year, showing the changes in relative position. It has a ribbon chart that makes the changes in relative position of the top 10 fleet throughout the years more perceptible. It contains a hierarchical filter as well, were it is possible to filter by species category and by species name, inside each category.
+
+
+![IOTC Model](<assets/- page 05 - fleet catch rank time analysis.png>)
+
+2. The matrix visual has the Dim_Fleet[Fleet] column in the rows well, the Dim_Date[Year] in the columns well and the measure [Rank Fleet Catches] as the value expression (values well). The rankx funtion iteractes trough the dim fleet table, calculating the catch in tons for each fleet and presenting the results in descending order. Dense provides no gap in the ranking numbers, if ties occur:
+
+   ```sql
+   Rank Fleet Catches = RANKX(All(Dim_Fleet),[Catch in Tons],,DESC,Dense)
+   ```
+
+3. The same measure is used in the ribbon chart, with Dim_Date[Year] in the x-axis and Dim_Fleet[Fleet] in the legend. The top 10 is achieve by filtering the visual in the Filters pane, with a Top N filter type, showing the top 10 fleets only.
+
+4. Concerning the filter, a hierarchical filter is achieve when two or more related columns are used in the field well. The columns should be related ie hierarchical in which the first column has the highest hierarchical position.
+
+
+
+### Page 7 - Stock Level Analysis
+
+1. This page was the most challenging one. It contains 5 cards, each for each main commercial species, and show the if the stock is stable, recovering, declining or if there is insufficient data to access stock health. It contains a vertical list filter with all the years in analysis for quick year selection. This page assumes that variations on the effort spent in catch a given stock provides a signal to the abundance of such stock.
+
+![IOTC Model](<assets/- page 06 - stock level analysis.png>)
+
+3. Each card has its own measure, although they work similarly. The stock state is calculated by comparing the cpue for a given year with the rolling cpue value for the 3 previous years. Those calculations were placed in variables. If one of the variables value is empty, then a "Insufficient data" string is shown. Otherwise, a switch expression is applied (switch is the dax syntax for if syntax, similar to case in sql). If the CPUE for the year in analysis is between 95% and 105% the rolling value, the stock is stable. If the cpue for the current year is above 105%, it is recovering, if it is < 95%, it is declining.
+
+   ```sql
+   Stock Signal BET = var BET_CPUE= [BET CPUE] var BET_CPUE_AVG =  CALCULATE([BET CPUE], DATESINPERIOD(Dim_Date[Date], LASTDATE(Dim_Date[Date]),-3,YEAR)) return IF(
+        ISBLANK(BET_CPUE) || ISBLANK(BET_CPUE_AVG),
+        "Insufficient data",
+        SWITCH(
+            TRUE(),
+            
+            BET_CPUE >= (BET_CPUE_AVG * 0.95) && BET_CPUE <= (BET_CPUE_AVG * 1.05), "Stable",
+            
+            
+            BET_CPUE > (BET_CPUE_AVG * 1.05), "Recovering",
+            
+    
+            BET_CPUE < (BET_CPUE_AVG * 0.95), "Declining",
+            
+            "Insufficient data"
+        )
+    )
+
+   ```
+
+4. In this measure, i was having difficulties making it work properly, so pasted what i had in gemini and it added the or clause before the switch. The code is the same for all card measures, only changing the CPUE measure, relating for each species using the previously mentioned species related cpue measures.
+
+
+
+### Page 8 - LL CTUE Price Comparision
+
+1. As explained in the page, the objective here is to compare the cpue values with the market values of main commercial species caught with longline. By combining both signals, it is possible to have some degree of certainty that the stock is in the state that the cpue analysis of the previous page is correct. 3 line and clustered bar charts are used to exemplify 3 stocks: BET, ALB (albacora) and YFT.
+
+![IOTC Model](<assets/- page 07 - stock level analysis.png>)
+
+
+2. All visuals in this page follow the same logic. Have the Dim_Date[Year] column in the X-axis, the CPUE measure for that species in the column y-axis and a measure calculating the average price in the line y-axis. Using the YFT as an example, the two measures are:
+
+   ```sql
+   YFT CPUE = CALCULATE([Catch Per Unit Effort Longline], Dim_Species[Species Code] = "YFT")
+
+   YFT Avg Price = CALCULATE(average(Tuna_Import_Prices[Price per kg]), Dim_Species[Species Code] ="YFT")
+
+   ```
+
+3. The relationship holds, as there is a correlation between lower CPUE and high prices in the 3 stocks, particularly in the big tropicsl tunas (BET and YFT).
+
+
+
+### Page 9 - Fleet Efficiency Analysis
+
+1. This page provides an overview of the 10 most efficient fleets, measured in cpue values, the % of total catch belonging to each one, by main type of gear. The visuals are stacked bar charts for each of top 10 by gear type and a card visual showing the % of total catch belonging to the top 10 most efficient fleet by longline and purse seine, respectively.
+
+
+![IOTC Model](<assets/- page 08 - fleet catch efficiency analysis.png>)
+
+2. The first column stacked visual shows the % of catch belonging to the ten most efficient longline fleets. The Dim_Fleet[Fleet] column is in the y-axis well and the measure [% of Catch of Top 10 LL Fleets] is on the x-axis well. Firstly, the top 10 fleets by catch in the longline fishery is calculated and stored in a variable. A second variable, TOP10LLCatch contains the total catch caught with longline, filtered by the list of fleets resulting from the first variable. The third variable calculates the overall total catch filtered by the gear (LL) and removing the filters on the dim_fleet (to fix the grand total result). Finally, the second variable is divided by the third variable to provide the % of catch belonging to the top 10 fleets in the longline fishery. The percentage format is defined in the measure tools.
+
+   ```sql
+   % of Catch of Top 10 LL Fleets = var Top10LLFleets = TOPN(10,ALL(Dim_Fleet[Fleet]), [Catch Per Unit Effort Longline], DESC) var TOP10LLCatch = CALCULATE(sum(Catch_Estimates_Model[Catch Weight]), 'Dim_Fisheries&Gear'[Fishery Group Code] = "LL", KEEPFILTERS(Top10LLFleets)) var TotalLLCatch = CALCULATE(sum(Catch_Estimates_Model[Catch Weight]),'Dim_Fisheries&Gear'[Fishery Group Code]="LL", All(Dim_Fleet[Fleet])) return DIVIDE(TOP10LLCatch,TotalLLCatch,0)
+
+   ```
+
+3. The measure on the second vizualization follows the same logic, applied to purse seine ("PS" in the Dim_Fisheries&Gear[Fishery Group Code] column):
+
+   ```sql
+   % of Catch of Top 10 PS Fleets = var Top10LLFleets = TOPN(10,ALL(Dim_Fleet[Fleet]), [Catch Per Unit Effort Purse Seine], DESC) var TOP10LLCatch = CALCULATE(sum(Catch_Estimates_Model[Catch Weight]), 'Dim_Fisheries&Gear'[Fishery Group Code] = "PS", KEEPFILTERS(Top10LLFleets)) var TotalLLCatch = CALCULATE(sum(Catch_Estimates_Model[Catch Weight]),'Dim_Fisheries&Gear'[Fishery Group Code]="PS", All(Dim_Fleet[Fleet])) return DIVIDE(TOP10LLCatch,TotalLLCatch,0)
+
+    ```
+
+4. The card visual uses the same measures in the value well, but as the value is not filtered by fleet, presents the total belonging to the top 10.
+
+
+
+### Page 10 - Catch Outliers Analisys
+
+1. This page contains statistical analysis. The first visual is a clustered column chart that bins the Catch_Estimates_Model[Catch Weight] column. Right-clicking on the column > New Group > Define the bin type and the bin size. In this case, 5000 (kgs). Then, on the visual, put the [Catch in Tons] measure in the y-axis and the Catch_Estimates_Model[Catch Weight] bins in the x-axis. It is possible to access that the majority of landings are of small quantities and that landings equal or above 15 tons are in much lower number.
+
+![IOTC Model](<assets/- page 09 - fleet outliers by catch.png>)
+
+2. The second visual, a stacked bar chart, uses the measure [90 Percentile Fleets by Catch]. To calculate the intended percentile, the function PERCENTILEX.INC is available. It iterates a table, in this case grouped by Year and Fleet, uses the measure [Catch in Tons] as the numerical expression to calculate the 90 percentile in annual total catch across the fleets. In other words, it creates a temporary table grouped by year and fleet, applies the measure, calculating it for each row and indicating the value at which the fleet catch falls within or below the 90th percentile:
+
+   ```sql
+   90 Percentile Fleets by Catch = PERCENTILEX.INC(SUMMARIZE(Catch_Estimates_Model,Catch_Estimates_Model[Fleet Code],Catch_Estimates_Model[Year]),[Catch in Tons],0.9)
+
+   ```
+3. Applying a reference line to the graph, it shows that all except the 9 top fleets fall bellow the 90th percentile. 
+ 
+
+
+### Page 11 - BET Forecast
+
+1. This is the final page, and shows a what-if analysis. It measures the expected economic impact per fleet in USD in variable reduction in BET quota. Obviously, it is expected that the biggest impact will be registered in the fleets with higher catches of BET.
+
+![IOTC Model](<assets/- page 10 - bet price impact forecast.png>)
+
+2. The what-if analysis starts by defining a what-if parameter. In Model View > New Parameter > Numeric Range > defined the name QuotaReductionPct with a range of 0 to 50, increments of 5 with a default of 0. This represents the percentage reduction range.
+
+3. This Quota Reduction parameter is stored in the table Quota Reduction. In a card visual, placed the Quota Reduction parameter in the Field well. The card uses a slider to adjust the reduction percentage.
+
+4. The main visual, a line chart, has the column Dim_Fleet[Fleet] in the x-axis well and the measure [BET Quota Adj Revenue Impact] that in turn subtracts the result of multiplying [Catch in Tons] and [BET Avg Price] from the [BET Quota Adj Revenue Forecast]. This measure  in turn uses a measure to calculate the reduction of catch for the BET quota by multiplying [Catch in Tons] to e <1 decimal value resulting from subtracting the quota reduction value from 1 and dividing it by 100. The calculate filters this to apply to only BET catches:
+
+   ```sql
+   BET Quota Adj Catch Forecast = CALCULATE([Catch in Tons]*(1-'Quota Reduction'[Quota Reduction Value] / 100), Dim_Species[Species Code] = "BET")
+
+   ```
+
+5. This measure calculates the average of price per kgs of BET tuna:
+
+   ```sql
+   BET Avg Price = CALCULATE(AVERAGE(Tuna_Import_Prices[Price per kg]), Dim_Species[Species Code]="BET")
+
+   ```
+
+6.  The two previous measures then allow to calculate the revenue forecast by multiplying one with the other (quantity * price essentially):
+   
+   ```sql
+  BET Quota Adj Revenue Forecast = [BET Quota Adj Catch Forecast] * [BET Avg Price]
+
+   ```
+
+7. Then, the mentioned [BET Quota Adj Revenue Impact] is calculated:
+
+   ```sql
+   BET Quota Adj Revenue Impact = [BET Quota Adj Revenue Forecast]-([Catch in Tons]*[BET Avg Price])
+
+   ```
+
+8. So, by adjusting the slicer that changes the value of the parameter used in the [BET Quota Adj Catch Forecast], calculating the USD value of that reduction and then comparing that value to the total economic value of BET catches, the economic impact if this what-if scenario can be calculated.
+
+
+
+
+## Final of README.mp
+
+Any suggestion for improvement are most welcome. 
 
 
 

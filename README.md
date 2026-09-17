@@ -1075,7 +1075,7 @@ As dax measures and visuals are intimately related, they are explained together 
 6.  The two previous measures then allow to calculate the revenue forecast by multiplying one with the other (quantity * price essentially):
    
    ```sql
-  BET Quota Adj Revenue Forecast = [BET Quota Adj Catch Forecast] * [BET Avg Price]
+   BET Quota Adj Revenue Forecast = [BET Quota Adj Catch Forecast] * [BET Avg Price]
 
    ```
 

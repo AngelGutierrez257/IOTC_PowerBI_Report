@@ -834,11 +834,11 @@ As dax measures and visuals are intimately related, they are explained together 
 
 1. This visual presents the catch per unit of effort for the main commercial species which are the skipjack tuna (Fao code SKJ), yellowfin tuna (YFT), Bigeye Tuba (BET), blue shark (BSH) and swordfish (SWO). They are all catch mainly with drifter longline gear (LL), except for the skipjak, which is catch both with longline and with purse seine, where the net is laid around the fish school and then hauled in.
 
-The catch per unit o effort metric is not fully normalized has it required converting the several measurements (number of hooks, number of sets, number of hours) to a cost of dollars per unit effort first, for example, in order to really compare productivity of each gear by unit of cost. In this case, the focus is to develop DAX calculations. The visual shows the evolution of CPUE for the referred species by year:
+2. The catch per unit of effort metric is not fully normalized has it required converting the several measurements (number of hooks, number of sets, number of hours) to a cost of dollars per unit effort first, for example, in order to really compare productivity of each gear by unit of cost. In this case, the focus is to develop DAX calculations. The visual shows the evolution of CPUE for the referred species by year:
 
 ![IOTC Model](<assets/- page 02 - analysis of catch per unit effort per species.png>)
 
-2. 
+3. 
 
 
 

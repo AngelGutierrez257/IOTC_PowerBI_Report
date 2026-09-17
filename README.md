@@ -824,21 +824,21 @@ As dax measures and visuals are intimately related, they are explained together 
 
 1. This page has a map visualization and a filter and allows to analyse the total catch in tons caught (or declared) in eastern or western areas of the IOTC regulatory area by species.
 
-2. ![IOTC Model](<assets/- page 01 - catches by IOTC macro-region.png>)
+![IOTC Model](<assets/- page 01 - catches by IOTC macro-region.png>)
 
-3. The map vizualization uses the Dim_Species[Species Name] column in the legend well, the IOTC_Major_Geo_Areas[center_lat] column in the latitude well, the IOTC_Major_Geo_Areas[center_lon] in the longitude well, the  [Catch in Tons] measure in the bubble size well and the IOTC_Major_Geo_Areas[First name_en] in the tooltips. For the slicer, the Dim_Species[Species Name] column was used, presented as a vertical list.
+2. The map vizualization uses the Dim_Species[Species Name] column in the legend well, the IOTC_Major_Geo_Areas[center_lat] column in the latitude well, the IOTC_Major_Geo_Areas[center_lon] in the longitude well, the  [Catch in Tons] measure in the bubble size well and the IOTC_Major_Geo_Areas[First name_en] in the tooltips. For the slicer, the Dim_Species[Species Name] column was used, presented as a vertical list.
 
 
 
-   ### Page 3 - CPUE Analysis (by species)
+### Page 3 - CPUE Analysis (by species)
 
-   1. This visual presents the catch per unit of effort for the main commercial species which are the skipjack tuna (Fao code SKJ), yellowfin tuna (YFT), Bigeye Tuba (BET), blue shark (BSH) and swordfish (SWO). They are all catch mainly with drifter longline gear (LL), except for the skipjak, which is catch both with longline and with purse seine, where the net is laid around the fish school and then hauled in.
+1. This visual presents the catch per unit of effort for the main commercial species which are the skipjack tuna (Fao code SKJ), yellowfin tuna (YFT), Bigeye Tuba (BET), blue shark (BSH) and swordfish (SWO). They are all catch mainly with drifter longline gear (LL), except for the skipjak, which is catch both with longline and with purse seine, where the net is laid around the fish school and then hauled in.
 
-      The catch per unit o effort metric is not fully normalized has it required converting the several measurements (number of hooks, number of sets, number of hours) to a cost of dollars per unit effort first, for example, in order to really compare productivity of each gear by unit of cost. In this case, the focus is to develop DAX calculations. The visual shows the evolution of CPUE for the referred species by year:
+The catch per unit o effort metric is not fully normalized has it required converting the several measurements (number of hooks, number of sets, number of hours) to a cost of dollars per unit effort first, for example, in order to really compare productivity of each gear by unit of cost. In this case, the focus is to develop DAX calculations. The visual shows the evolution of CPUE for the referred species by year:
 
-2. ![IOTC Model](<assets/- page 02 - analysis of catch per unit effort per species.png>)
+![IOTC Model](<assets/- page 02 - analysis of catch per unit effort per species.png>)
 
-3. 
+2. 
 
 
 

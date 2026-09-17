@@ -1093,7 +1093,7 @@ As dax measures and visuals are intimately related, they are explained together 
 
 ## Final of README.mp
 
-Any suggestion for improvement are most welcome. 
+Any suggestions for improvement are most welcome. 
 
 
 

@@ -8,7 +8,7 @@ This report analyses economic, effort and catch data from IOTC to assess fleet e
 
 The report and semantic model were built as an applied project for the PL-300 certification, using Power Query for data preparation and modelling, and DAX for time intelligence, ranking, what-if scenarios and statistical analysis. See Data Preparation and Dax Measures & visualizations sections for the complete code, explained. 
 
-For self-study, I asked Claude to prepare manuals for Dax and Power Query based on the Freidman technique and organize them based on the old Skillpipe manuals, in order to prepare for the exam. The visualization and administration skills were studied trough the Microsoft Learning Path (https://learn.microsoft.com/en-us/credentials/certifications/data-analyst-associate/?practice-assessment-type=certification) and the book PL-300 Exam Ref, of author Daniil Maslyuk.
+For self-study, I asked Claude to prepare manuals for Dax and Power Query based on the Feynman technique and organize them based on the old Skillpipe manuals, in order to prepare for the exam. The visualization and administration skills were studied trough the Microsoft Learning Path (https://learn.microsoft.com/en-us/credentials/certifications/data-analyst-associate/?practice-assessment-type=certification) and the book PL-300 Exam Ref, of author Daniil Maslyuk.
 
 
 

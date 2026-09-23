@@ -12,6 +12,12 @@ This document contains all M transformations, data modelling steps and dax measu
 - assets/ contains illustrative images of each page of the report and of the semantic model.
 - README.md contains the project explanation.
 
+## Table of contents
+- [Data Sources](#1. Data Sources)
+- [Data Preparation](#2.Data Preparation)
+- [Data Model](#3. Data Model)
+- [Dax Measures & Visuals](#4. Dax Measures & Visuals)
+
 ## 1. Data Sources:
 
 ### Yearly Catch Data:
@@ -691,7 +697,7 @@ This ends the Data Preparation phase.
 
 
 
-## Data Model
+## 3. Data Model
 
 The resulting data model is a multi-fact star-schema with multiple one to many (1 : *) relationships from dimensional tables to the fact tables. Bridge tables were calculated in DAX (Dim_Year_Bridge,Dim_YearMonth_Bridge), as well tables for what-if analysis, and for measures  . They will be described below. 
 
@@ -773,7 +779,7 @@ This parameter will be used on the measures applied in the last report page.
 
 
 
-## Dax Measures & Visuals:
+## 4. Dax Measures & Visuals:
 
 
 As dax measures and visuals are intimately related, they are explained together to make their use and connection as clear as possible. The measure table was created with:

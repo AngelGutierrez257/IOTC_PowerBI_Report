@@ -2,9 +2,7 @@
 
 ## Synopsis:
 
-This report analyses economic, effort and catch data from IOTC to assess fleet efficiency and quota sustainability by fleet (flag), commercial species and gear type for the period from 2000 to 2024. The analytical framework and metrics draw directly from my experience as a scientific fisheries observer in the IOTC Regulatory Area. One example of this cross-applied know-how is the page report on stock level analysis:
-
-![IOTC Model](<assets/- page 06 - stock level analysis.png>)
+This report analyses economic, effort and catch data from IOTC to assess fleet efficiency and quota sustainability by fleet (flag), commercial species and gear type for the period from 2000 to 2024. The analytical framework and metrics draw directly from my experience as a scientific fisheries observer in the IOTC Regulatory Area. 
 
 The report and semantic model were built as an applied project for the PL-300 certification, using Power Query for data preparation and modelling, and DAX for time intelligence, ranking, what-if scenarios and statistical analysis. See Data Preparation and Dax Measures & visualizations sections for the complete code, explained. 
 

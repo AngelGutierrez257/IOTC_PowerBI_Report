@@ -13,10 +13,10 @@ This document contains all M transformations, data modelling steps and dax measu
 - README.md contains the project explanation.
 
 ## Table of contents
-- [Data Sources](#1. Data Sources)
-- [Data Preparation](#2.Data Preparation)
-- [Data Model](#3. Data Model)
-- [Dax Measures & Visuals](#4. Dax Measures & Visuals)
+- [Data Sources](##1. Data Sources)
+- [Data Preparation](##2.Data Preparation)
+- [Data Model](##3. Data Model)
+- [Dax Measures & Visuals](##4. Dax Measures & Visuals)
 
 ## 1. Data Sources:
 

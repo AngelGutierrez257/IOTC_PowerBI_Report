@@ -1,7 +1,7 @@
 # IOTC Catch and Effort Analysis - Power BI Semantic Model and Report
 
 ## Synopsis:
-<div style = "text-align: justify">
+<div align = justify">
 This report analyses economic, effort and catch data from IOTC to assess fleet efficiency and quota sustainability by fleet (flag), commercial species and gear type for the period from 2000 to 2024. The analytical framework and metrics draw directly from my experience as a scientific fisheries observer in the IOTC Regulatory Area. 
 </div>
 

@@ -17,17 +17,22 @@ For self-study, I asked Claude to prepare manuals for Dax and Power Query based 
 - What-if scenario modelling impact on  expected revenue by quota reduction trends
 - Stock health signals derived from CPUE trend analysis
 
-## Dashboard:
+## Snapshots:
 
 ### Model:
-![IOTC Model](assets/-IOTC Model.png)
+![IOTC Model](<assets/- IOTC Model .png>)
+
+
+### Dashbaord:
+![IOTC Model](<assets/- IOTC Report Dashboard.png>)
 
 ## Repository structure:
 
 - IOTC/ contains the semantic model and report json files.
 - assets/ contains illustrative images of each page of the report and of the semantic model.
 - README.md contains the project presentation.
-- Technical report explains the project step by
+- Technical report.md report contains full technical documentation, with explained code:
+   [Technical report.md](<Technical report.md>)
 
 
    

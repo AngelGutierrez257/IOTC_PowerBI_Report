@@ -23,7 +23,7 @@ For self-study, I asked Claude to prepare manuals for Dax and Power Query based 
 ![IOTC Model](<assets/- IOTC Model .png>)
 
 
-### Dashbaord:
+### Dashboard:
 ![IOTC Model](<assets/- IOTC Report Dashboard.png>)
 
 ## Repository structure:

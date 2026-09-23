@@ -983,7 +983,7 @@ As dax measures and visuals are intimately related, they are explained together 
 
    ```
 
-4. In this measure, i was having difficulties making it work properly, so pasted what i had in gemini and it added the or clause before the switch. The code is the same for all card measures, only changing the CPUE measure, relating for each species using the previously mentioned species related cpue measures.
+4. In this measure, the initial logic returned incorrect blanks and by adding a Blank() handling logic with OR (||) before the switch solved it. The code is the same for all card measures, only changing the CPUE measure, relating for each species using the previously mentioned species related cpue measures.
 
 
 

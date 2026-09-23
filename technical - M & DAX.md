@@ -1,7 +1,7 @@
 # Data Preparation, Data Modelling and Dax Measures & Visualizations - detailed code.
 
 
-This document contains all M transformations, data modelling steps and dax measures & visualizations explained step by step.
+This document contains all M transformations, data modelling steps and dax measures & visualizations explained step by step, for the IOTC Power BI project.
 
 
 

@@ -13,12 +13,12 @@ This document contains all M transformations, data modelling steps and dax measu
 - README.md contains the project explanation.
 
 ## Table of contents
-- [Data Sources](#1-data-sources)
-- [Data Preparation](#2-data-preparation---power-query)
-- [Data Model](#3-data-model)
-- [Dax Measures & Visuals](#4.-dax-measures-and-visuals)
+- [Data Sources](#data-sources)
+- [Data Preparation](#data-preparation---power-query)
+- [Data Model](#data-model)
+- [Dax Measures & Visuals](#dax-measures-and-visuals)
 
-#1-data-sources
+## Data Sources
 
 ### Yearly Catch Data:
 
@@ -90,7 +90,7 @@ This document contains all M transformations, data modelling steps and dax measu
 The use of parameters is preferred has it handles changes in source locations more gracefully and easily and also allow the use of deployment pipelines.
 
 
-#2-data-preparation---power-query:
+## Data Preparation - Power Query
 
   Mai tasks: Data normalization, null handling, prepare data for modelling, filter and define data types, rows and columns relevant for the model.
 
@@ -696,7 +696,7 @@ This ends the Data Preparation phase.
 
 
 
-#3-data-model
+## Data Model
 
 The resulting data model is a multi-fact star-schema with multiple one to many (1 : *) relationships from dimensional tables to the fact tables. Bridge tables were calculated in DAX (Dim_Year_Bridge,Dim_YearMonth_Bridge), as well tables for what-if analysis, and for measures  . They will be described below. 
 
@@ -778,7 +778,7 @@ This parameter will be used on the measures applied in the last report page.
 
 
 
-#4-dax-measures-and-visuals
+## Dx Measures and Visuals
 
 
 As dax measures and visuals are intimately related, they are explained together to make their use and connection as clear as possible. The measure table was created with:

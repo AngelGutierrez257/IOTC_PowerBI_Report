@@ -14,9 +14,9 @@ This document contains all M transformations, data modelling steps and dax measu
 
 ## Table of contents
 - [Data Sources](#data-sources)
-- [Data Preparation](#data-preparation---power-query)
+- [Data Preparation - Power Query](#data-preparation---power-query)
 - [Data Model](#data-model)
-- [Dax Measures & Visuals](#dax-measures-and-visuals)
+- [Dax Measures and Visuals](#dax-measures-and-visuals)
 
 ## Data Sources
 
@@ -778,7 +778,7 @@ This parameter will be used on the measures applied in the last report page.
 
 
 
-## Dx Measures and Visuals
+## Dax Measures and Visuals
 
 
 As dax measures and visuals are intimately related, they are explained together to make their use and connection as clear as possible. The measure table was created with:

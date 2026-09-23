@@ -13,12 +13,12 @@ This document contains all M transformations, data modelling steps and dax measu
 - README.md contains the project explanation.
 
 ## Table of contents
-- [Data Sources](##1. Data Sources)
-- [Data Preparation](##2.Data Preparation)
-- [Data Model](##3. Data Model)
-- [Dax Measures & Visuals](##4. Dax Measures & Visuals)
+- [Data Sources](#1-data-sources)
+- [Data Preparation](#2-data-preparation---power-query)
+- [Data Model](#3-data-model)
+- [Dax Measures & Visuals](#4.-dax-measures-and-visuals)
 
-## 1. Data Sources:
+#1-data-sources
 
 ### Yearly Catch Data:
 
@@ -90,7 +90,7 @@ This document contains all M transformations, data modelling steps and dax measu
 The use of parameters is preferred has it handles changes in source locations more gracefully and easily and also allow the use of deployment pipelines.
 
 
-## 2 Data Preparation - Power Query:
+#2-data-preparation---power-query:
 
   Mai tasks: Data normalization, null handling, prepare data for modelling, filter and define data types, rows and columns relevant for the model.
 
@@ -101,8 +101,7 @@ The use of parameters is preferred has it handles changes in source locations mo
 
 
 
-## Fact Tables:
-
+- Nest, we import and apply data transformation steps to the fact tables:
 
 ### Catch_Estimates (staging, not imported to the model)
 
@@ -697,7 +696,7 @@ This ends the Data Preparation phase.
 
 
 
-## 3. Data Model
+#3-data-model
 
 The resulting data model is a multi-fact star-schema with multiple one to many (1 : *) relationships from dimensional tables to the fact tables. Bridge tables were calculated in DAX (Dim_Year_Bridge,Dim_YearMonth_Bridge), as well tables for what-if analysis, and for measures  . They will be described below. 
 
@@ -779,7 +778,7 @@ This parameter will be used on the measures applied in the last report page.
 
 
 
-## 4. Dax Measures & Visuals:
+#4-dax-measures-and-visuals
 
 
 As dax measures and visuals are intimately related, they are explained together to make their use and connection as clear as possible. The measure table was created with:
